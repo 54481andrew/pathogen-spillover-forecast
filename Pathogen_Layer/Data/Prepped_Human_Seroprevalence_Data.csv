@@ -1,0 +1,102 @@
+"Longitude","Latitude","Country","Village","Species","NumPosAg","NumTestAg","PropAg","NumPosAb","NumTestAb","PropAb","Source","DiagnosticMethod","Target","Human_Random_Survey","TotTest","TotPos","ArenaStat"
+-7.07,6.66,"Ivory Coast","For√™t Class√©e","Homo sapiens",NA,NA,NA,8,39,0.205128205128205,"Akoua-Koffi_TerMeulen_2006","IFA","IgG",TRUE,39,8,1
+-7.48,6.54,"Ivory Coast","Guiglo","Homo sapiens",NA,NA,NA,33,124,0.266129032258065,"Akoua-Koffi_TerMeulen_2006","IFA","IgG",TRUE,124,33,1
+-9.325026136,7.652919162,"Guinea","Bamakama","Homo sapiens",NA,NA,NA,4,26,0.153846153846154,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,26,4,1
+-10.516667,8.966667,"Guinea","Bandadou","Homo sapiens",NA,NA,NA,1,41,0.024390243902439,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,41,1,1
+-9.182514379,7.368273797,"Guinea","Bemeye","Homo sapiens",NA,NA,NA,1,9,0.111111111111111,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,9,1,1
+-9.224964689,7.721734525,"Guinea","Bowe centre","Homo sapiens",NA,NA,NA,8,30,0.266666666666667,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,30,8,1
+-8.955102,7.346378,"Guinea","Diecke centre","Homo sapiens",NA,NA,NA,3,73,0.0410958904109589,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,73,3,1
+-10.33170493,8.638230041,"Guinea","Fandou Bendou","Homo sapiens",NA,NA,NA,5,33,0.151515151515152,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,33,5,1
+-8.588210029,7.731118438,"Guinea","Gogota","Homo sapiens",NA,NA,NA,0,6,0,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,6,0,0
+-8.588210029,7.731118438,"Guinea","Gote Koly","Homo sapiens",NA,NA,NA,7,21,0.333333333333333,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,21,7,1
+-8.397183631,7.987612064,"Guinea","Gueasso center","Homo sapiens",NA,NA,NA,1,11,0.0909090909090909,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,11,1,1
+-10.60763195,8.362968589,"Guinea","Kelema","Homo sapiens",NA,NA,NA,1,23,0.0434782608695652,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,23,1,1
+-8.566984874,7.85623728,"Guinea","Kokota","Homo sapiens",NA,NA,NA,16,51,0.313725490196078,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,51,16,1
+-10.43176638,8.825908303,"Guinea","Koumoni","Homo sapiens",NA,NA,NA,2,40,0.05,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,40,2,1
+-9.012713136,7.311970319,"Guinea","Kowi","Homo sapiens",NA,NA,NA,4,29,0.137931034482759,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,29,4,1
+-8.582145699,8.009507861,"Guinea","Laine center","Homo sapiens",NA,NA,NA,2,37,0.0540540540540541,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,37,2,1
+-9.264382835,7.358889884,"Guinea","Manangoya","Homo sapiens",NA,NA,NA,0,12,0,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,12,0,0
+-8.588210029,7.731118438,"Guinea","Manga Bo","Homo sapiens",NA,NA,NA,0,19,0,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,19,0,0
+-10.20738617,8.506855257,"Guinea","Mangala","Homo sapiens",NA,NA,NA,1,26,0.0384615384615385,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,26,1,1
+-8.506341573,8.09709105,"Guinea","Morigbedou","Homo sapiens",NA,NA,NA,4,40,0.1,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,40,4,1
+-9.109742417,7.293202492,"Guinea","Nawei","Homo sapiens",NA,NA,NA,10,53,0.188679245283019,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,53,10,1
+-8.400215796,7.624767423,"Guinea","N‚Äôzoo center","Homo sapiens",NA,NA,NA,2,35,0.0571428571428571,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,35,2,1
+-8.333508165,7.890644961,"Guinea","Pine","Homo sapiens",NA,NA,NA,15,36,0.416666666666667,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,36,15,1
+-10.20738617,8.506855257,"Guinea","Sandia","Homo sapiens",NA,NA,NA,2,51,0.0392156862745098,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,51,2,1
+-10.20738617,8.506855257,"Guinea","Sokoro","Homo sapiens",NA,NA,NA,2,32,0.0625,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,32,2,1
+-8.542727553,7.590359741,"Guinea","Theasso","Homo sapiens",NA,NA,NA,2,25,0.08,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,25,2,1
+-8.32441167,7.734246409,"Guinea","Tounkarata center","Homo sapiens",NA,NA,NA,1,47,0.0212765957446809,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,47,1,1
+-10.06790657,8.478703517,"Guinea","Yaradou","Homo sapiens",NA,NA,NA,7,51,0.137254901960784,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,51,7,1
+-9.412958922,7.421449305,"Guinea","Yekeni","Homo sapiens",NA,NA,NA,2,8,0.25,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,8,2,1
+-10.45299153,8.600694388,"Guinea","Yelindou","Homo sapiens",NA,NA,NA,4,50,0.08,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,50,4,1
+-9.26135067,7.487136697,"Guinea","Yomou center","Homo sapiens",NA,NA,NA,3,49,0.0612244897959184,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,49,3,1
+-8.588210029,7.731118438,"Guinea","Zougueta","Homo sapiens",NA,NA,NA,2,13,0.153846153846154,"Kerneis_Koivogui_2009","IFA","IgG",TRUE,13,2,1
+-11.03,9.84,"Guinea","Gbetaya","Homo sapiens",NA,NA,NA,20,47,0.425531914893617,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,47,20,1
+-10.75,9.88,"Guinea","Kamaraya","Homo sapiens",NA,NA,NA,33,130,0.253846153846154,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,130,33,1
+-10.88,9.72,"Guinea","Sangoyah","Homo sapiens",NA,NA,NA,76,182,0.417582417582418,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,182,76,1
+-10.7,9.97,"Guinea","Tindo","Homo sapiens",NA,NA,NA,20,61,0.327868852459016,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,61,20,1
+-10.03,8.56,"Guinea","Bawa","Homo sapiens",NA,NA,NA,28,51,0.549019607843137,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,51,28,1
+-10.6,8.5,"Guinea","Fangamandou","Homo sapiens",NA,NA,NA,32,112,0.285714285714286,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,112,32,1
+-10.37,8.7,"Guinea","Nongoa Mbalia","Homo sapiens",NA,NA,NA,47,116,0.405172413793103,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,116,47,1
+-10.44,8.48,"Guinea","Owet Djiba","Homo sapiens",NA,NA,NA,31,83,0.373493975903614,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,83,31,1
+-10.3,8.75,"Guinea","Sassani Toli","Homo sapiens",NA,NA,NA,33,97,0.34020618556701,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,97,33,1
+-10.43,8.47,"Guinea","Telekolo","Homo sapiens",NA,NA,NA,24,80,0.3,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,80,24,1
+-12.45,9.88,"Guinea","Madina Oula camp","Homo sapiens",NA,NA,NA,59,171,0.345029239766082,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,171,59,1
+-8.55,7.62,"Guinea","Gbah","Homo sapiens",NA,NA,NA,28,109,0.256880733944954,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,109,28,1
+-8.52,7.71,"Guinea","Gbenemou","Homo sapiens",NA,NA,NA,11,59,0.186440677966102,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,59,11,1
+-8.5,7.58,"Guinea","Thuo","Homo sapiens",NA,NA,NA,63,190,0.331578947368421,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,190,63,1
+-9.32,11.57,"Guinea","Balato","Homo sapiens",NA,NA,NA,27,150,0.18,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,150,27,1
+-9.27,7.72,"Guinea","Bamakama","Homo sapiens",NA,NA,NA,42,138,0.304347826086957,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,138,42,1
+-9.26,7.66,"Guinea","Komore","Homo sapiens",NA,NA,NA,46,183,0.251366120218579,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,183,46,1
+-9.26,7.56,"Guinea","Waita","Homo sapiens",NA,NA,NA,31,120,0.258333333333333,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,120,31,1
+-12.1680221,11.06625311,"Guinea","Bantignel","Homo sapiens",NA,NA,NA,10,165,0.0606060606060606,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,165,10,1
+-12.1680221,11.41256047,"Guinea","Sala","Homo sapiens",NA,NA,NA,8,111,0.0720720720720721,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,111,8,1
+-12.2434451,11.95781037,"Guinea","Mali","Homo sapiens",NA,NA,NA,8,147,0.054421768707483,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,147,8,1
+-12.10631238,11.95781037,"Guinea","Deppal","Homo sapiens",NA,NA,NA,1,29,0.0344827586206897,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,29,1,1
+-9.3833333,11.6,"Guinea","Kintinian","Homo sapiens",NA,NA,NA,13,168,0.0773809523809524,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,168,13,1
+-9.685919854,11.40519223,"Guinea","Torekoro","Homo sapiens",NA,NA,NA,5,100,0.05,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,100,5,1
+-14.04674037,11.07362135,"Guinea","Hamdalaye","Homo sapiens",NA,NA,NA,5,102,0.0490196078431373,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,102,5,1
+-14.21815628,10.41784783,"Guinea","Walia","Homo sapiens",NA,NA,NA,6,160,0.0375,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,160,6,1
+-9.727059671,11.73676311,"Guinea","Balato","Homo sapiens",NA,NA,NA,27,150,0.18,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,150,27,1
+-10.36472682,8.642101563,"Guinea","Dawa Bombolo","Homo sapiens",NA,NA,NA,31,65,0.476923076923077,"Lukashevich_Clegg_1993","ELISA","IgG",TRUE,65,31,1
+-11.93,9.18,"Sierra Leone","Kamabunyele","Homo sapiens",NA,NA,NA,17,118,0.144067796610169,"McCormick_Webb_1987","IFA, Isolation","IgG, IgM",TRUE,118,17,1
+-12.23,9.5,"Sierra Leone","Kathumpe","Homo sapiens",NA,NA,NA,9,88,0.102272727272727,"McCormick_Webb_1987","IFA, Isolation","IgG, IgM",TRUE,88,9,1
+-11.07,8.23,"Sierra Leone","Bomie","Homo sapiens",NA,NA,NA,62,617,0.100486223662885,"McCormick_Webb_1987","IFA, Isolation","IgG, IgM",TRUE,617,62,1
+-11.07,8.23,"Sierra Leone","Landoma","Homo sapiens",NA,NA,NA,17,157,0.10828025477707,"McCormick_Webb_1987","IFA, Isolation","IgG, IgM",TRUE,157,17,1
+-11.02,8.1,"Sierra Leone","Konia","Homo sapiens",NA,NA,NA,271,733,0.369713506139154,"McCormick_Webb_1987","IFA, Isolation","IgG, IgM",TRUE,733,271,1
+-11.07,8.22,"Sierra Leone","Kpandebu","Homo sapiens",NA,NA,NA,87,578,0.150519031141869,"McCormick_Webb_1987","IFA, Isolation","IgG, IgM",TRUE,578,87,1
+-11.03,8.22,"Sierra Leone","Lowoma","Homo sapiens",NA,NA,NA,37,285,0.129824561403509,"McCormick_Webb_1987","IFA, Isolation","IgG, IgM",TRUE,285,37,1
+-11,8.12,"Sierra Leone","Neama","Homo sapiens",NA,NA,NA,16,105,0.152380952380952,"McCormick_Webb_1987","IFA, Isolation","IgG, IgM",TRUE,105,16,1
+-11.07,8,"Sierra Leone","Niahun","Homo sapiens",NA,NA,NA,204,1075,0.189767441860465,"McCormick_Webb_1987","IFA, Isolation","IgG, IgM",TRUE,1075,204,1
+-11.05,8.23,"Sierra Leone","Njakundoma","Homo sapiens",NA,NA,NA,48,242,0.198347107438017,"McCormick_Webb_1987","IFA, Isolation","IgG, IgM",TRUE,242,48,1
+-11.05,8.22,"Sierra Leone","Palima","Homo sapiens",NA,NA,NA,113,217,0.52073732718894,"McCormick_Webb_1987","IFA, Isolation","IgG, IgM",TRUE,217,113,1
+-11.05,8.22,"Sierra Leone","Tongola","Homo sapiens",NA,NA,NA,125,402,0.310945273631841,"McCormick_Webb_1987","IFA, Isolation","IgG, IgM",TRUE,402,125,1
+-10.87,8.02,"Sierra Leone","Semewabu","Homo sapiens",NA,NA,NA,141,372,0.379032258064516,"McCormick_Webb_1987","IFA, Isolation","IgG, IgM",TRUE,372,141,1
+-11.169823,8.714835,"Sierra Leone","Yengema","Homo sapiens",NA,NA,NA,9,109,0.0825688073394495,"McCormick_Webb_1987","IFA, Isolation","IgG, IgM",TRUE,109,9,1
+-2.621978022,10.25123328,"Ghana","Natorduori","Homo sapiens",NA,NA,NA,4,70,0.0571428571428571,"Nimo-Paintsil_Fichet-Calvet_2019","ELISA","IgG",TRUE,70,4,1
+-1.628571429,9.545748318,"Ghana","Bowena","Homo sapiens",NA,NA,NA,0,70,0,"Nimo-Paintsil_Fichet-Calvet_2019","ELISA","IgG",TRUE,70,0,0
+-0.362637363,10.39394094,"Ghana","Teanoba","Homo sapiens",NA,NA,NA,2,70,0.0285714285714286,"Nimo-Paintsil_Fichet-Calvet_2019","ELISA","IgG",TRUE,70,2,1
+-0.327472527,8.344660549,"Ghana","Jirandogo","Homo sapiens",NA,NA,NA,2,70,0.0285714285714286,"Nimo-Paintsil_Fichet-Calvet_2019","ELISA","IgG",TRUE,70,2,1
+-2.323076923,7.115996883,"Ghana","Amomaso","Homo sapiens",NA,NA,NA,0,70,0,"Nimo-Paintsil_Fichet-Calvet_2019","ELISA","IgG",TRUE,70,0,0
+-1.778021978,6.168359282,"Ghana","Ankaakur","Homo sapiens",NA,NA,NA,5,31,0.161290322580645,"Nimo-Paintsil_Fichet-Calvet_2019","ELISA","IgG",TRUE,31,5,1
+-0.828571429,6.444156422,"Ghana","Ehiawenwu","Homo sapiens",NA,NA,NA,10,67,0.149253731343284,"Nimo-Paintsil_Fichet-Calvet_2019","ELISA","IgG",TRUE,67,10,1
+-1.417582418,10.62199074,"Ghana","Doninga","Homo sapiens",NA,NA,NA,2,70,0.0285714285714286,"Nimo-Paintsil_Fichet-Calvet_2019","ELISA","IgG",TRUE,70,2,1
+-1.654945055,7.96548719,"Ghana","Mangoase","Homo sapiens",NA,NA,NA,2,69,0.0289855072463768,"Nimo-Paintsil_Fichet-Calvet_2019","ELISA","IgG",TRUE,69,2,1
+-0.608791209,7.667991921,"Ghana","Menkwo","Homo sapiens",NA,NA,NA,7,70,0.1,"Nimo-Paintsil_Fichet-Calvet_2019","ELISA","IgG",TRUE,70,7,1
+-7.155833,10.58917,"Mali","Bamba","Homo sapiens",NA,NA,NA,88,200,0.44,"Sogoba_Rosenke_2016","ELISA","IgG",TRUE,200,88,1
+-7.151667,10.38306,"Mali","Banzana","Homo sapiens",NA,NA,NA,29,200,0.145,"Sogoba_Rosenke_2016","ELISA","IgG",TRUE,200,29,1
+-7.248056,10.52389,"Mali","Soromba","Homo sapiens",NA,NA,NA,82,200,0.41,"Sogoba_Rosenke_2016","ELISA","IgG",TRUE,200,82,1
+-7.155833,10.58917,"Mali","Bamba","Homo sapiens",NA,NA,NA,2,200,0.01,"Sogoba_Rosenke_2016","ELISA","IgM",TRUE,200,2,1
+-7.151667,10.38306,"Mali","Banzana","Homo sapiens",NA,NA,NA,1,200,0.005,"Sogoba_Rosenke_2016","ELISA","IgM",TRUE,200,1,1
+-7.248056,10.52389,"Mali","Soromba","Homo sapiens",NA,NA,NA,1,200,0.005,"Sogoba_Rosenke_2016","ELISA","IgM",TRUE,200,1,1
+-9.785626,7.513232,"Liberia","Gbanwei","Homo sapiens",NA,NA,NA,32,391,0.0818414322250639,"Yalley-Ogunro_Frame_1984","IFA","IgG",TRUE,391,32,1
+-9.785626,7.513232,"Liberia","Gbanwei","Homo sapiens",NA,NA,NA,13,162,0.0802469135802469,"Yalley-Ogunro_Frame_1984","IFA","IgG",TRUE,162,13,1
+-9.7228,7.440117,"Liberia","Yapoa","Homo sapiens",NA,NA,NA,2,212,0.00943396226415094,"Yalley-Ogunro_Frame_1984","IFA","IgG",TRUE,212,2,1
+-9.520278,7.91,"Liberia","Zuwulo","Homo sapiens",NA,NA,NA,12,293,0.0409556313993174,"Yalley-Ogunro_Frame_1984","IFA","IgG",TRUE,293,12,1
+-9.520278,7.91,"Liberia","Zuwulo","Homo sapiens",NA,NA,NA,6,128,0.046875,"Yalley-Ogunro_Frame_1984","IFA","IgG",TRUE,128,6,1
+-10.06698,7.581362,"Liberia","Balagualazu","Homo sapiens",NA,NA,NA,12,392,0.0306122448979592,"Yalley-Ogunro_Frame_1984","IFA","IgG",TRUE,392,12,1
+-10.21,8.36,"Liberia","Foya Kamara","Homo sapiens",NA,NA,NA,12,85,0.141176470588235,"Yalley-Ogunro_Frame_1984","IFA","IgG",TRUE,85,12,1
+-10.673393,8.141355,"Liberia","Borlelo","Homo sapiens",NA,NA,NA,7,138,0.0507246376811594,"Yalley-Ogunro_Frame_1984","IFA","IgG",TRUE,138,7,1
+-9.48,8.03,"Liberia","Zigida","Homo sapiens",NA,NA,NA,4,133,0.0300751879699248,"Monath_Mertens_1973","CF",NA,TRUE,133,4,1
+-11.2166667,8.2,"Sierra Leone","hospital","Homo sapiens",NA,NA,NA,0,49,0,"Fraser_Campbell_1974","CF","IgG, IgM",TRUE,49,0,0
+-11.2833333,8.45,"Sierra Leone","hospital","Homo sapiens",NA,NA,NA,16,206,0.0776699029126214,"Fraser_Campbell_1974","CF","IgG, IgM",TRUE,206,16,1

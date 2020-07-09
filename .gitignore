@@ -1,0 +1,6 @@
+*~
+*.DS
+*.DS_Store
+*.Rhistory
+*._Raster_Data
+*._Shape_files

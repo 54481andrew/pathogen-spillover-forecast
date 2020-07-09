@@ -1,0 +1,25 @@
+[general]
+creator=R package 'raster'
+created=2020-03-02 10:22:41
+[georeference]
+nrows=461
+ncols=671
+xmin=-17.549999963
+ymin=4.249999467
+xmax=16.000000537
+ymax=27.29999981
+projection=+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0
+[data]
+datatype=FLT4S
+byteorder=little
+nbands=28
+bandorder=BIL
+minvalue=1:23.3116149902344:0.00102741725277156:0.00699999975040555:0:0:0.2034602612257:0:0.120806075632572:0:0:0.0115734031423926:0.0020001083612442:0.0100502101704478:0.263157904148102:0:0:0:0:0:0:0:0:0:0:0:0:0
+maxvalue=2640.24879399343:47.8413772583008:11.8022174835205:0.79755687713623:3.46410155296326:1.27199387550354:1:0.404443293809891:1:0.443192213773727:1.44850504398346:36.9824867248535:0.80889880657196:0.913868367671967:12:12:61202.3053839745:1:1:0.999998569488525:1:1:1:1:1:0.999996066093445:1:1
+nodatavalue=-3.4e+38
+[legend]
+legendtype=
+values=
+color=
+[description]
+layername=Elev:Tmu:Pmu:Nmu:Pcv:Ncv:Pc:Pm:Nc:Nm:Pmin:Pmax:Nmin:Nmax:Pdur:Ndur:Pop:Water_Bodies:Evergreen_Broadleaf_Forest:Open_Shrubland:Woody_Savanna:Savannas:Grasslands:Permanent_Wetlands:Croplands:Urban_BuiltUp:Cropland_Natural_Mosaic:Barren
