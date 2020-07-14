@@ -118,6 +118,9 @@ Prep.Pathogen.Data <- function(){
     cat('--Lassa Rodent Count Statistics--')
     tab <- table(jrod.purged$ArenaStat)
     print(addmargins(tab, FUN = list(Total = sum), quiet = TRUE))
+    ## --Lassa Rodent Count Statistics--
+    ##     0     1 Total
+    ##    36    38    74
     
     ## Number of seroprevalence studies of humans
     print(paste('Number of Human Sources: ', length(unique(human.test.dat$Source))), quote = FALSE)
@@ -131,6 +134,7 @@ Prep.Pathogen.Data <- function(){
     years = as.numeric(years)
     years = years[!is.na(years)] ## Filter out entries that are not years
     print(paste0('Human seroprevalence collected between ', paste(range(years), collapse = '-')), quote = FALSE)
+    ##"Human seroprevalence collected between 1973-2019"
     
     png(file = paste0('Figures_Fits/Human_Test_Dat.png'), width = 6, height = 4, units = 'in', res = 400)
     par(mai = 1*c(0.2,0.2,0.2,0.2))
@@ -139,12 +143,5 @@ Prep.Pathogen.Data <- function(){
     legend(x = 'topleft', legend = 'Human LASV sero-survey', pch = 21, pt.bg = 'green', col = 'black')
     dev.off()
     
-    ## --Lassa Rodent Count Statistics--
-    ##     0     1 Total
-    ##    36    38    74
-    
-    
-    ##"Human seroprevalence collected between 1973-2019"
-
     return(jrod.purged)
 } ## End function    
