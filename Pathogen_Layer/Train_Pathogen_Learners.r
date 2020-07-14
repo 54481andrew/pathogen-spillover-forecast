@@ -249,6 +249,6 @@ train.pathogen.learners <- function(rodlsv.survey.dat, gridgi = NULL){
     dev.off()
 
     ## Remove fitted models
-    unlink('Models', recursive = TRUE)
+    unlink(models.folder, recursive = TRUE)
 
 }## End function
