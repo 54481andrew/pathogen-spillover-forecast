@@ -126,7 +126,8 @@ Train.Reservoir.Learners <- function(dataset, gridgi = NULL){
 
         ## Set up a dataframe to store things in
         tree.dat <- data.frame(boot.i = boot.i, n.tree = gbm.mod$n.trees, max.tree = max.trees,
-                               model.oob.auc = NA, model.oob.auc.pwd = NA)
+                               model.oob.auc = NA, model.oob.auc.pwd = NA, n.oob.auc = NA,
+                               n.oob.auc.pwd = NA)
 
         ## Method 1: Form the test dataset without pairwise distance sampling
         wi.test.abs.1 <- sample(nrow(all.test.background),
@@ -139,6 +140,7 @@ Train.Reservoir.Learners <- function(dataset, gridgi = NULL){
         model.predictions <- extract(x = pred.rast,
                                      y = test.dataset[,c('Longitude', 'Latitude')])
         tree.dat$model.oob.auc <- roc.area(test.dataset$Presence, model.predictions)$A
+        tree.dat$n.oob.auc <- nrow(test.dataset)
 
         ## Method 2: Use pairwise-distance sampling to find appropriate set of test absences
         wi.test.background <- pwdSample(fixed = test.presences[,c('Longitude', 'Latitude')],
@@ -158,23 +160,23 @@ Train.Reservoir.Learners <- function(dataset, gridgi = NULL){
         model.predictions <- extract(x = pred.rast,
                                      y = test.dataset[,c('Longitude', 'Latitude')])
         tree.dat$model.oob.auc.pwd <- roc.area(test.dataset$Presence, model.predictions)$A
+        tree.dat$n.oob.auc.pwd <- nrow(test.dataset)
 
-        ### ADD IN ASSESSMENT BY SPECIES
-
+        ## Store average classification score for each unique species
         spec.names <- unique(paste(dataset$Species))
-        spec.dat <- matrix(nrow = 1, ncol = 2*length(spec.names))
+        spec.dat <- matrix(nrow = 1, ncol = 3*length(spec.names))
         for(spec in spec.names){
-            wi.spec <- paste(test.dataset$Species)==spec
-            spec.preds <- model.predictions[wi.spec]
+            mask.spec <- paste(test.dataset$Species)==spec
+            spec.preds <- model.predictions[mask.spec]
             m <- mean(spec.preds, na.rm = TRUE)
             s <- sd(spec.preds, na.rm = TRUE)
             spec.dat[1,which(spec==spec.names)] <- m
             spec.dat[1, length(spec.names) + which(spec==spec.names)] <- s
+            spec.dat[1, 2*length(spec.names) + which(spec==spec.names)] <- sum(mask.spec)
         }
         write.table(spec.dat, file = assess.filename,
                     col.names = FALSE, row.names = FALSE,
                     append = file.exists(assess.filename))
-
 
 
         ###
@@ -330,6 +332,22 @@ Train.Reservoir.Learners <- function(dataset, gridgi = NULL){
            cex = 1, bty = 'n')
     plot(rgeos::gIntersection(foc.shp.ogr, masto.rangemap), add = TRUE, bty = 'n', asp = 1, lwd = 3)
     dev.off()
+
+    ## Process and rewrite  data with each species classification score to file
+    assess.dat = read.table(file = assess.filename)
+    spec.names = unique(paste(dataset$Species))
+    assess.mean = assess.dat[,1:length(spec.names)] ## first set of columns store the means
+    names(assess.mean) = spec.names
+    assess.sd <- assess.dat[,length(spec.names) + 1:length(spec.names)] ## second set of columns store the std dev's
+    names(assess.sd) = spec.names
+    assess.num <- assess.dat[,2*length(spec.names) + 1:length(spec.names)] ## third set of columns store the number of each species
+    dat <- data.frame(species = spec.names,
+                      mean = as.vector(colMeans(assess.mean, na.rm = TRUE)),
+                      sd = as.vector(colMeans(assess.sd, na.rm = TRUE)),
+                      medianCount = as.vector(apply(assess.num, MARGIN = 2, FUN = median)))
+    dat <- dat[order(dat$mean, decreasing = TRUE),]
+    dat <- na.omit(dat)## omit those for which sd cannot be calculated (fewer than 3 entries)
+    write.table(dat, file = assess.filename, row.names = FALSE)
 
     ## Remove fitted models
     unlink(models.folder, recursive = TRUE)

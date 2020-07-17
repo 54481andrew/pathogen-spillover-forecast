@@ -106,16 +106,3 @@ print(paste0('Run time: ', Sys.time() - starttime))
 
 
 
-a = read.table(file = paste('Figures_Fits/', prefix, '/', fold, '/assess.dat', sep = ''))
-spec.names = unique(paste(classi.dat.rod$Species))
-meana = a[,1:length(spec.names)]
-names(meana) = spec.names
-
-sda <- a[,-c(1:length(spec.names))]
-names(sda) = spec.names
-
-dat <- data.frame(mean = colMeans(meana, na.rm = TRUE),
-                  sd = colMeans(sda, na.rm = TRUE))
-dat[order(dat$mean),]
-
-spec.names[order(rowMeans(meana, na.rm = TRUE))]
