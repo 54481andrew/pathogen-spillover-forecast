@@ -351,6 +351,12 @@ $$
 3. Use equations derived in the manuscript to convert the predicted
    seroprevalence into predictions of LASV incidence. 
 
+Figures are saved in the [grid.name] folder (located within
+Figures_Fits), except for the product risk layer. This script also
+outputs a data file foc_case, contained in the grid.name folder, 
+that summarizes data found in the manuscript table. Column names are
+self-explanatory; "Pop" denotes the country's total population size. 
+
 ### Human_Link_Analysis.cdf
 
 This is a Mathematica file that derives the expressions found in 
