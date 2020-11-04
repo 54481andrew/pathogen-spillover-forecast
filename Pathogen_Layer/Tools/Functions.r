@@ -1,23 +1,16 @@
 ## Add columns describing total individuals tested, total
 ## number of individuals that were positive, and
 ## general positive / absence of LASV.
-add.total.columns <- function(dat){
-    num.pos.ag <- with(dat, ifelse(is.na(NumPosAg), 0, NumPosAg))
-    num.test.ag <- with(dat, ifelse(is.na(NumTestAg), 0, NumTestAg))
-    num.pos.ab <- with(dat, ifelse(is.na(NumPosAb), 0, NumPosAb))
-    num.test.ab <- with(dat, ifelse(is.na(NumTestAb), 0, NumTestAb))
-    tot.test <- num.test.ag + num.test.ab
-    dat$TotTest <- tot.test
-    dat$TotPos <- num.pos.ag + num.pos.ab
+add.total.columns <- function(dat, min.test = 5){
+    ## Update NA values in counts to 0
+    dat$NumPosVirus <- with(dat, ifelse(is.na(NumPosVirus), 0, NumPosVirus))
+    dat$NumTestVirus <- with(dat, ifelse(is.na(NumTestVirus), 0, NumTestVirus))
+    dat$NumPosAb <- with(dat, ifelse(is.na(NumPosAb), 0, NumPosAb))
+    dat$NumTestAb <- with(dat, ifelse(is.na(NumTestAb), 0, NumTestAb))
 
-    ## Add column indicating general arenavirus status. Note that for
-    ## an absence, the survey must have tested at least 5 individuals.
-    dat$ArenaStat <- NA
-    pos.result <- with(dat, NumPosAg > 0)
-    neg.result <- with(dat, (TotTest >= 5 & TotPos==0))
-
-    dat[which(pos.result), 'ArenaStat'] <- 1
-    dat[which(neg.result), 'ArenaStat'] <- 0
+    ## Compute total tested, total positive 
+    dat$TotPos <- with(dat, NumPosVirus)
+    dat$TotTest <- with(dat, NumTestVirus + NumTestAb)
 
     return(dat)
 }
@@ -95,6 +88,9 @@ purge.repeats <- function(dat, template){
     points <- cbind(dat$Longitude, dat$Latitude)
     cells <- raster::extract(template, points, cellnumbers=TRUE)[,'cells']
 
+    ## Prepare a column that stores the cell/pixel from which the datum originates
+    dat$Cell = NA
+    
     ## Loop through rows of dat dataframe, retain points that fall in unique
     ## cells, omit repeats based on some ranking
     omit.points <- c()
@@ -113,18 +109,24 @@ purge.repeats <- function(dat, template){
             dat.with.repeats.removed <- rbind(dat.with.repeats.removed,
                                               dat[keep.repeat,])
 
-            ## Total tested/positive
+            ## Calculate total tested or positive in the cell
             ldat <- nrow(dat.with.repeats.removed)
-            dat.with.repeats.removed$TotTest[ldat] <- sum(dat[repeat.set, 'TotTest'], na.rm = TRUE)
-            dat.with.repeats.removed$TotPos[ldat] <- sum(dat[repeat.set, 'TotPos'], na.rm = TRUE)
             ## Serology
-            dat.with.repeats.removed$NumTestAb[ldat] <- sum(dat[repeat.set, 'NumTestAb'], na.rm = TRUE)
-            dat.with.repeats.removed$NumPosAb[ldat] <- sum(dat[repeat.set, 'NumPosAb'], na.rm = TRUE)
+            dat.with.repeats.removed$NumTestAb[ldat] <- sum(dat[repeat.set, 'NumTestAb'],
+                                                            na.rm = TRUE)
+            dat.with.repeats.removed$NumPosAb[ldat] <- sum(dat[repeat.set, 'NumPosAb'],
+                                                           na.rm = TRUE)
             ## PCR
-            dat.with.repeats.removed$NumTestAg[ldat] <- sum(dat[repeat.set, 'NumTestAg'], na.rm = TRUE)
-            dat.with.repeats.removed$NumPosAg[ldat] <- sum(dat[repeat.set, 'NumPosAg'], na.rm = TRUE)
-            ## Other aggregated stats
-            dat.with.repeats.removed$ArenaStat[ldat] <- max(dat[repeat.set, 'ArenaStat'])
+            dat.with.repeats.removed$NumTestVirus[ldat] <- sum(dat[repeat.set, 'NumTestVirus'],
+                                                               na.rm = TRUE)
+            dat.with.repeats.removed$NumPosVirus[ldat] <- sum(dat[repeat.set, 'NumPosVirus'],
+                                                              na.rm = TRUE)
+            ## Update/aggregate other columns
+            dat.with.repeats.removed$TotTest[ldat] <- dat.with.repeats.removed$NumTestVirus[ldat] +
+                dat.with.repeats.removed$NumTestAb[ldat]
+            dat.with.repeats.removed$TotPos[ldat] <- sum(dat[repeat.set, 'NumPosVirus'], na.rm = TRUE)
+            ## Record cell number
+            dat.with.repeats.removed$Cell[ldat] <- cells[keep.repeat]
         } ## End if checking for repeats
     } ## Loop through jj
     ## Statistics on the aggregation
@@ -134,12 +136,16 @@ purge.repeats <- function(dat, template){
     return(list(dat.with.repeats.removed, rem.dat))
 }## End Function
 
+
+
 ## Generate a folder name for tree with specified properties
-generate.lassa.name <- function(gridgi){
-    fold.name <- with(gridgi, paste('pa_nboots', nboots,
+generate.lassa.name <- function(hypers.i){
+    fold.name <- with(hypers.i, paste('pa_nboots', nboots,
                                     tree.complexity,
                                     'mllr', mllr,
                                     'lmt', lmt,
+                                    'ambi', set.ambiguous.to,
+                                    'mintest', min.test,
                                     sep='_')) ## Folder suffix for data storage and results
     return(fold.name)
 }
