@@ -122,7 +122,8 @@ foc.countries <- c('Mali', "Guinea", "Ivory Coast", "Sierra Leone",
 
 ## Africa shapefile source: http://www.maplibrary.org/library/stacks/Africa/index.htm
 all.africa.shp = st_read(dsn = paste(shapefile.storage.fold,'/Africa/',sep=''),
-                          layer = 'Africa')
+                         layer = 'Africa')
+
 ## Resave with crs info added
 st_crs(all.africa.shp) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 st_write(all.africa.shp, dsn = paste(shapefile.storage.fold,'/Africa/',sep=''),
@@ -130,7 +131,7 @@ st_write(all.africa.shp, dsn = paste(shapefile.storage.fold,'/Africa/',sep=''),
 
 adf <- as.data.frame(all.africa.shp)
 country.ord = adf$COUNTRY
-foc.shp <- all.africa.shp[country.ord %in% foc.countries,4]
+foc.shp <- all.africa.shp[country.ord %in% foc.countries,c('COUNTRY','geometry')]
 
 ## Write West Africa shapefile
 wa.shapefile.fold <- paste(shapefile.storage.fold, '/West_Africa', sep = '')
@@ -139,3 +140,16 @@ st_write(foc.shp, dsn = wa.shapefile.fold, layer = 'foc',
          driver = 'ESRI Shapefile',
          delete_dsn = TRUE)
 
+## Create raster that describes lifespan in each West African country
+## Read in lifespan data from WorldBank
+lifespan.dat <- read.csv("../CSV_Data/Country_Lifespans/API_SP.DYN.LE00.IN_DS2_en_csv_v2_1345073.csv", skip = 4, stringsAsFactors = FALSE) 
+## Make sure "Cote d`Ivoire" is written correctly in lifespan.dat
+lifespan.dat[grep('Cote', lifespan.dat$Country.Name), 'Country.Name'] <- "Cote d`Ivoire"
+lifespan.africa.shp = merge(foc.shp, lifespan.dat, by.x = 'COUNTRY', by.y = 'Country.Name')
+lifespan.rast <- rasterize(x = lifespan.africa.shp, all.stack[[1]]*0, field = 'X2018')
+writeRaster(lifespan.rast, filename = paste0(raster.data.storage.fold, '/Lifespan.tif'))
+
+## Save condensed version of lifespan CSV. Used in Human_link.r script
+foc.lifespan.dat <- lifespan.dat[lifespan.dat$Country.Name %in% foc.countries,
+                                 c('Country.Name', 'X2018')]
+write.csv(foc.lifespan.dat, file = '../CSV_Data/foc_Lifespan.csv', row.names = FALSE)
