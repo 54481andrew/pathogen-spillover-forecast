@@ -42,13 +42,15 @@ Calc.Sig.Pathogen.Preds <- function(dataset){
             print(p)
         })
     }
-    pdf(file = 'Figures_Fits/Sig_Pathogen_Predictors.pdf',
+    pdf(file = paste0('Figures_Fits/', prefix, '/',fold,'/',
+                      'Sig_Pathogen_Predictors.pdf'),
         width = 15, height = 10)
     grid.arrange(grobs = graph.list)
     dev.off()
     
     ## Write significant predictor names to file.
-    write.table(sig.var.names, file = 'Figures_Fits/Sig_Pathogen_Preds',
+    write.csv(sig.var.names, file = paste0('Figures_Fits/', prefix, '/',fold,'/',
+                                             'Sig_Pathogen_Preds.csv'),
                 row.names = FALSE)
 
     return(sig.var.names)
