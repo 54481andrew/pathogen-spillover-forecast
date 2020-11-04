@@ -10,6 +10,7 @@
 ## boosted tree modeling, plotting, and
 ## calculating the AUC statistic
 require(raster)
+options("rgdal_show_exportToProj4_warnings"="none") ## Turn off gdal warnings
 require(rgdal)
 require(sf)
 require(parallel)
@@ -23,7 +24,7 @@ require(verification)
 require(viridis)
 
 ## Directory name that will contain output for all hyperparameter sets
-prefix <- 'reservoir_v2'
+prefix <- 'reservoir_v3'
 
 ## Set version of random number generator to use to ensure
 ## reproducibility across R versions
@@ -43,7 +44,15 @@ africa.shp.ogr <- readOGR(dsn = paste(storage.fold, '/Shapefiles/Africa', sep = 
 masto.rangemap <-readOGR(dsn = paste(storage.fold, '/Shapefiles/Masto_Range', sep = ''), layer = 'data_0', verbose = FALSE)
 
 ## The raw GBIF data provides background points
-raw.dat <- read.csv('Data/GBIF_Background_Murid_Data.csv', sep = "\t")
+raw.dat <- read.csv('Data/GBIF_Background_Murid_Data.csv', sep = "\t",
+                    stringsAsFactors = FALSE)
+
+## ## Anna's occurrence data
+## raw.dat <- read.csv('Data/occurrence_trimcols.csv', sep = ",", stringsAsFactors = FALSE)
+## raw.dat$decimalLongitude <- as.numeric(raw.dat$decimalLongitude)
+## raw.dat$decimalLatitude <- as.numeric(raw.dat$decimalLatitude)
+## sum(is.na(raw.dat$decimalLatitude))
+## sum(is.na(raw.dat$countryCode))
 
 ## Additional functions that prep the data and predictors
 source("Tools/Functions.r")
@@ -59,7 +68,7 @@ source("Train_Reservoir_Learners.r")
 ## tree.complexity - depth of trees that are fit at each model iteration
 ## mllr - minus log10 of the learning rate
 ## lmt - log10 of the max.trees parameter
-grid <- expand.grid(Species = c('Mastomys natalensis'),
+hypers.dat <- expand.grid(Species = c('Mastomys natalensis'),
                     nboots = 25,
                     num.bg.points = c('Same'),
                     tree.complexity = c(1),
@@ -71,11 +80,25 @@ cat(paste0('\n\n\n\n' , '---- ', prefix, ' ----', '\n\n\n\n'))
 
 starttime <- Sys.time()
 
-for(gi in 1:nrow(grid)){
+## Create [prefix] directory
+dirpath <- paste('Figures_Fits/',prefix,sep='')
+if(!dir.exists(dirpath)){dir.create(dirpath, showWarnings = FALSE)}
 
-    Species = paste(grid$Species[gi])
+for(ii in 1:nrow(hypers.dat)){
 
-    ## Prep in the presence/absence data
+    ## Set up [prefix] subdirectories
+    fold <- generate.res.name(hypers.dat[ii,])
+    dirpath <- paste('Figures_Fits/', prefix, '/', fold,sep='')
+    models.folder = paste0('Figures_Fits/', prefix, '/', fold, '/Models')
+    if(!dir.exists(dirpath)){
+        dir.create(dirpath, showWarnings = FALSE)
+    }else{
+        unlink(models.folder, recursive = TRUE)
+    }
+    dir.create(models.folder,showWarnings = FALSE)
+
+    ## Prep in the presence/absence data for [Species]
+    Species = paste(hypers.dat$Species[ii])
     classi.dat.rod <- Prep.Reservoir.Data(Species)
 
     ## Predictors that are deemed significant by the Wilcox test
@@ -83,26 +106,51 @@ for(gi in 1:nrow(grid)){
 
     ## Train learners with the given set of hyperparameters
     out <- Train.Reservoir.Learners(dataset = classi.dat.rod,
-                                    grid[gi,])
+                                    hypers.dat[ii,])
 
     ## Extract AUC statistics with (auc.pwd) and without (auc) pairwise distance sampling
-    fold <- generate.res.name(grid[gi,])
     tree.dat <- read.table(paste('Figures_Fits/', prefix, '/', fold,'/tree.dat',sep=''),
                            header = TRUE)
-    grid[gi,'auc'] <- mean(unlist(tree.dat[,'model.oob.auc']), na.rm = TRUE)
-    grid[gi,'sd.auc'] <- sd(unlist(tree.dat[,'model.oob.auc']), na.rm = TRUE)
+    hypers.dat[ii,'auc'] <- mean(unlist(tree.dat[,'model.oob.auc']), na.rm = TRUE)
+    hypers.dat[ii,'sd.auc'] <- sd(unlist(tree.dat[,'model.oob.auc']), na.rm = TRUE)
 
-    grid[gi,'auc.pwd'] <- mean(unlist(tree.dat[,'model.oob.auc.pwd']), na.rm = TRUE)
-    grid[gi,'sd.auc.pwd'] <- sd(unlist(tree.dat[,'model.oob.auc.pwd']), na.rm = TRUE)
+    hypers.dat[ii,'auc.pwd'] <- mean(unlist(tree.dat[,'model.oob.auc.pwd']), na.rm = TRUE)
+    hypers.dat[ii,'sd.auc.pwd'] <- sd(unlist(tree.dat[,'model.oob.auc.pwd']), na.rm = TRUE)
 
     ## Write AUC statistics to file
-    write.table(grid, file = paste('Figures_Fits/', prefix, '/grid_res_data', sep = ''),
+    write.table(hypers.dat, file = paste('Figures_Fits/', prefix, '/hypers_res_data', sep = ''),
                 row.names = FALSE)
 
-    print(paste('--- gi:', gi, ' ---', sep = ''), quote = FALSE)
+    print(paste('--- ii:', ii, ' ---', sep = ''), quote = FALSE)
 }
 
 print(paste0('Run time: ', Sys.time() - starttime))
 
 
 
+a = read.table(file = paste('Figures_Fits/', prefix, '/', fold, '/assess.dat', sep = ''))
+spec.names = unique(paste(classi.dat.rod$Species))
+meana = a[,1:length(spec.names)]
+names(meana) = spec.names
+
+sda <- a[,-c(1:length(spec.names))]
+names(sda) = spec.names
+
+dat <- data.frame(mean = colMeans(meana, na.rm = TRUE),
+                  sd = colMeans(sda, na.rm = TRUE))
+dat[order(dat$mean),]
+
+spec.names[order(rowMeans(meana, na.rm = TRUE))]
+
+
+
+## ## Check against anna's
+## keep <- !is.na(raw.dat$decimalLatitude) & !is.na(raw.dat$decimalLongitude) &
+##     !is.na(raw.dat$species) & paste(raw.dat$species)!="" &
+##     paste(raw.dat$species) != Species & !is.na(raw.dat$year) &
+##     raw.dat$year >= minimum.year &
+##     raw.dat$basisOfRecord %in% c('PRESERVED_SPECIMEN', 'MATERIAL_SAMPLE') &
+##     raw.dat$countryCode %in% country.codes$code &
+##     !is.na(raw.dat$genus) &
+##     !(raw.dat$genus %in% c('Mastomys'))
+## nrow(raw.dat[keep,])

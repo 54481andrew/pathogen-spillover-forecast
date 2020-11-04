@@ -15,11 +15,11 @@
 ## curve" (AUC) calculated on an out-of-bag test set, and the number of
 ## trees-building iterations that were deemed best by cross-validation.
 
-Train.Reservoir.Learners <- function(dataset, gridgi = NULL){
+Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
 
-    ## Define gridgi if not provided
-    if(length(gridgi)==0){
-        gridgi <- data.frame(Species = 'Mastomys natalensis',
+    ## Define hypers.i if not provided
+    if(length(hypers.i)==0){
+        hypers.i <- data.frame(Species = 'Mastomys natalensis',
                              nboots = 25,
                              num.bg.points = "Same",
                              tree.complexity = 1,
@@ -28,30 +28,21 @@ Train.Reservoir.Learners <- function(dataset, gridgi = NULL){
 
     }
 
-    ## Extract variables from gridgi
-    Species = paste(gridgi$Species)
+    ## Extract variables from hypers.i
+    Species = paste(hypers.i$Species)
     Abbrev.name <- paste0(substr(paste(Species),1,1),
                           substr(strsplit(paste(Species),' ')[[1]][2],1,1))
 
-    nboots = gridgi$nboots
-    tree.complexity = gridgi$tree.complexity
-    num.bg.points = gridgi$num.bg.points
-    learning.rate <- 10^-gridgi[,'mllr']
-    max.trees <- 10^gridgi[,'lmt']
+    nboots = hypers.i$nboots
+    tree.complexity = hypers.i$tree.complexity
+    num.bg.points = hypers.i$num.bg.points
+    learning.rate <- 10^-hypers.i[,'mllr']
+    max.trees <- 10^hypers.i[,'lmt']
 
     ## Generate directory name where all output will be saved
-    fold <- generate.res.name(gridgi)
+    fold <- generate.res.name(hypers.i)
     cat(paste0('\n\n\n\n'))
     print(paste('--------- Model fit name:', fold, '-------------'), quote = FALSE)
-
-    ## Set up data directories
-    dirpath <- paste('Figures_Fits/',prefix,sep='')
-    if(!dir.exists(dirpath)){dir.create(dirpath, showWarnings = FALSE)}
-    dirpath <- paste('Figures_Fits/', prefix, '/', fold,sep='')
-    if(!dir.exists(dirpath)){dir.create(dirpath, showWarnings = FALSE)}
-    models.folder = paste0('Figures_Fits/', prefix, '/', fold, '/Models')
-    unlink(models.folder, recursive = TRUE)
-    dir.create(models.folder,showWarnings = FALSE)
 
     ## Model fit statistics are stored here
     tree.filename = paste0('Figures_Fits/', prefix, '/',
@@ -126,8 +117,7 @@ Train.Reservoir.Learners <- function(dataset, gridgi = NULL){
 
         ## Set up a dataframe to store things in
         tree.dat <- data.frame(boot.i = boot.i, n.tree = gbm.mod$n.trees, max.tree = max.trees,
-                               model.oob.auc = NA, model.oob.auc.pwd = NA, n.oob.auc = NA,
-                               n.oob.auc.pwd = NA)
+                               model.oob.auc = NA, model.oob.auc.pwd = NA)
 
         ## Method 1: Form the test dataset without pairwise distance sampling
         wi.test.abs.1 <- sample(nrow(all.test.background),
@@ -140,7 +130,6 @@ Train.Reservoir.Learners <- function(dataset, gridgi = NULL){
         model.predictions <- extract(x = pred.rast,
                                      y = test.dataset[,c('Longitude', 'Latitude')])
         tree.dat$model.oob.auc <- roc.area(test.dataset$Presence, model.predictions)$A
-        tree.dat$n.oob.auc <- nrow(test.dataset)
 
         ## Method 2: Use pairwise-distance sampling to find appropriate set of test absences
         wi.test.background <- pwdSample(fixed = test.presences[,c('Longitude', 'Latitude')],
@@ -160,23 +149,23 @@ Train.Reservoir.Learners <- function(dataset, gridgi = NULL){
         model.predictions <- extract(x = pred.rast,
                                      y = test.dataset[,c('Longitude', 'Latitude')])
         tree.dat$model.oob.auc.pwd <- roc.area(test.dataset$Presence, model.predictions)$A
-        tree.dat$n.oob.auc.pwd <- nrow(test.dataset)
 
-        ## Store average classification score for each unique species
+        ### ADD IN ASSESSMENT BY SPECIES
+
         spec.names <- unique(paste(dataset$Species))
-        spec.dat <- matrix(nrow = 1, ncol = 3*length(spec.names))
+        spec.dat <- matrix(nrow = 1, ncol = 2*length(spec.names))
         for(spec in spec.names){
-            mask.spec <- paste(test.dataset$Species)==spec
-            spec.preds <- model.predictions[mask.spec]
+            wi.spec <- paste(test.dataset$Species)==spec
+            spec.preds <- model.predictions[wi.spec]
             m <- mean(spec.preds, na.rm = TRUE)
             s <- sd(spec.preds, na.rm = TRUE)
             spec.dat[1,which(spec==spec.names)] <- m
             spec.dat[1, length(spec.names) + which(spec==spec.names)] <- s
-            spec.dat[1, 2*length(spec.names) + which(spec==spec.names)] <- sum(mask.spec)
         }
         write.table(spec.dat, file = assess.filename,
                     col.names = FALSE, row.names = FALSE,
                     append = file.exists(assess.filename))
+
 
 
         ###
@@ -280,6 +269,26 @@ Train.Reservoir.Learners <- function(dataset, gridgi = NULL){
     response.dat$var.pretty <- factor(pretty.labels(response.dat$var),
                                       levels = pretty.labels(ord.names),
                                       ordered = TRUE)
+
+    ## Choose the six top predictors
+    response.dat <- response.dat[response.dat$var.pretty %in% vars.to.plot.pretty,]
+
+    ## Make it so that for each predictor, the range of the predictor values in 
+    for(pred in unique(response.dat$var)){
+        min.pred <- min(response.dat[response.dat$var==pred,'x'])
+        max.pred <- max(response.dat[response.dat$var==pred,'x'])
+        pred.mask <- response.dat$var==pred
+        for(booti in unique(response.dat$boot)){
+            boot.mask = response.dat$boot==booti & pred.mask
+            response.sub <- subset(response.dat, subset = boot.mask)
+            interp.out <- approx(x = response.sub$x, y = response.sub$y,
+                                 xout = seq(min.pred, max.pred, length = 100), rule = 2)
+            response.sub$x <- interp.out$x
+            response.sub$y <- interp.out$y            
+            response.dat[boot.mask,] = response.sub
+        }}
+
+    ## Rename for ggplot graph
     response.dat$Effect = response.dat$y
     response.dat$Value = response.dat$x
 
@@ -294,18 +303,18 @@ Train.Reservoir.Learners <- function(dataset, gridgi = NULL){
            device = 'png', width = 7, height = 5, units = 'in')
 
 
-    ggplot(data = response.dat[response.dat$var.pretty %in% vars.to.plot.pretty,]) +
-        stat_summary_bin(aes(x = Value, y = Effect, group = var.pretty),
-                         fun.data = mean_se, fun.args = list(mult = 2),
-                         color = "black", fill = 'blue',
-                         geom = 'ribbon', bins = 30) +
-    theme_classic() +
-        stat_summary_bin(aes(x = Value, y = Effect, group = var.pretty),
-                         geom = 'line', size = 1, fun = mean, fun.args = list(na.rm = TRUE)) +
-        facet_wrap(~var.pretty, ncol = 3, nrow = 2, scales = 'free') + xlab('Predictor Value') +
-        ylab('Classification Score')
-    ggsave(filename = paste('Figures_Fits/', prefix, '/', fold, '/Effect_Response_', Abbrev.name,'_var.png', sep = ''),
-           device = 'png', width = 7, height = 5, units = 'in')
+    ## ggplot(data = response.dat[response.dat$var.pretty %in% vars.to.plot.pretty,]) +
+    ##     stat_summary_bin(aes(x = Value, y = Effect, group = var.pretty),
+    ##                      fun.data = mean_se, fun.args = list(mult = 2),
+    ##                      color = "black", fill = 'blue',
+    ##                      geom = 'ribbon', bins = 30) +
+    ## theme_classic() +
+    ##     stat_summary_bin(aes(x = Value, y = Effect, group = var.pretty),
+    ##                      geom = 'line', size = 1, fun = mean, fun.args = list(na.rm = TRUE)) +
+    ##     facet_wrap(~var.pretty, ncol = 3, nrow = 2, scales = 'free') + xlab('Predictor Value') +
+    ##     ylab('Classification Score')
+    ## ggsave(filename = paste('Figures_Fits/', prefix, '/', fold, '/Effect_Response_', Abbrev.name,'_var.png', sep = ''),
+    ##        device = 'png', width = 7, height = 5, units = 'in')
 
 
     ## Plot risk map averaged over all boot predictions
@@ -332,22 +341,6 @@ Train.Reservoir.Learners <- function(dataset, gridgi = NULL){
            cex = 1, bty = 'n')
     plot(rgeos::gIntersection(foc.shp.ogr, masto.rangemap), add = TRUE, bty = 'n', asp = 1, lwd = 3)
     dev.off()
-
-    ## Process and rewrite  data with each species classification score to file
-    assess.dat = read.table(file = assess.filename)
-    spec.names = unique(paste(dataset$Species))
-    assess.mean = assess.dat[,1:length(spec.names)] ## first set of columns store the means
-    names(assess.mean) = spec.names
-    assess.sd <- assess.dat[,length(spec.names) + 1:length(spec.names)] ## second set of columns store the std dev's
-    names(assess.sd) = spec.names
-    assess.num <- assess.dat[,2*length(spec.names) + 1:length(spec.names)] ## third set of columns store the number of each species
-    dat <- data.frame(species = spec.names,
-                      mean = as.vector(colMeans(assess.mean, na.rm = TRUE)),
-                      sd = as.vector(colMeans(assess.sd, na.rm = TRUE)),
-                      medianCount = as.vector(apply(assess.num, MARGIN = 2, FUN = median)))
-    dat <- dat[order(dat$mean, decreasing = TRUE),]
-    dat <- na.omit(dat)## omit those for which sd cannot be calculated (fewer than 3 entries)
-    write.table(dat, file = assess.filename, row.names = FALSE)
 
     ## Remove fitted models
     unlink(models.folder, recursive = TRUE)

@@ -99,8 +99,8 @@ purge.repeats <- function(dat, template){
 }## End Function
 
 ## Generate name for model run directories
-generate.res.name <- function(gridgi){
-    fold.name <- with(gridgi, paste(paste0(substr(paste(Species),1,1),
+generate.res.name <- function(hypers.i){
+    fold.name <- with(hypers.i, paste(paste0(substr(paste(Species),1,1),
                                            substr(strsplit(paste(Species),' ')[[1]][2],1,1)),
                                     'pa_nboots',nboots,
                                     'nbg', num.bg.points,

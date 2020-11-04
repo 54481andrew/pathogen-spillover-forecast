@@ -4,20 +4,43 @@
 ## background captures of other Murids.
 
 Prep.Reservoir.Data <- function(Species){
-
     ## Load in [Species] occurrence dataset. Keep only those columns that are needed,
     ## and discard any entries without Lat/Lon values. The data-set is called classi.dat, short
     ## for classification data-set.
     Species.name = gsub(' ', '_', Species)
-    data = read.table(file = paste0('Data/Dataset_', Species.name, '.csv'), sep = ";", header = TRUE)
-    keep <- c('Species', 'Latitude', 'Longitude', 'Country', 'Confidence')
-    dat.1 <- data[,keep]
+    presence.data = read.table(file = paste0('Data/', Species.name, '_presences.csv'),
+                               sep = "\t", header = TRUE, stringsAsFactors = FALSE)
+    presence.data$Latitude = as.numeric(presence.data$Latitude)
+    presence.data$Longitude = as.numeric(presence.data$Longitude)
+
+    ## Make "Year" entry a range with minYear and maxYear
+    ## Remove entries without year
+    presence.data$Year = as.character(presence.data$Year)
+    keep <- presence.data$Year!=""
+    presence.data <- presence.data[keep,]
+    for(yi in 1:nrow(presence.data)){
+        yr <- presence.data$Year[yi]
+        if(grepl(',', yr)){
+            yr.split <- strsplit(yr,',')[[1]]
+        }else{
+            yr.split <- strsplit(yr,'-')[[1]]
+        }        
+        yr.split <- as.numeric(yr.split)
+        presence.data$min.Year[yi] <- min(yr.split)
+        presence.data$max.Year[yi] <- max(yr.split)
+        presence.data$Year[yi] <- with(presence.data[yi,], (min.Year + max.Year)/2)
+    }
+    presence.data$Year <- as.numeric(presence.data$Year)
+
+    ##    keep <- c('Species', 'Latitude', 'Longitude', 'Country', 'Confidence')
+    keep <- c('Latitude', 'Longitude', 'Country', 'Species', 'Year', 'min.Year', 'max.Year')
+    dat.1 <- presence.data[,keep]
     classi.dat <- dat.1[which(!is.na(dat.1$Longitude) & !is.na(dat.1$Latitude)),]
 
     ## Only keep entries that are high confidence (species id is based on
-    ## PCR, rather than based on morphology).
-    keep <- which(classi.dat$Confidence=='high')
-    classi.dat <- classi.dat[keep,]
+    ## cytochrome b, rather than based on morphology).
+    ## keep <- which(classi.dat$Confidence=='high')
+    ## classi.dat <- classi.dat[keep,]
     
     ## Add column indicating that these are Presence data
     classi.dat$Presence = 1
@@ -25,46 +48,92 @@ Prep.Reservoir.Data <- function(Species){
     ## -- Incorporate GenBank dataset into classi.dat
     
     ## Load GenBank data
-    genbank.dat <- read.csv('Data/Rodents_Genbank_June16_2020.csv', stringsAsFactors = FALSE,
+    genbank.dat <- read.csv('Data/Rodents_Genbank_Oct_2020.csv', stringsAsFactors = FALSE,
                          sep = '\t')
 
     ## Prune the dataset to those entries that are of Mastomys natalensis, and
     ## for which latitude and longitude are available.
     wi.genbank <- (genbank.dat$gbHost=='Mastomys natalensis') &
         !is.na(genbank.dat$Lat) & !is.na(genbank.dat$Long) &
-        genbank.dat$ID_method %in% c('CytB','DNA')
+        genbank.dat$ID_method %in% c('CytB','DNA') &
+        !is.na(genbank.dat$gbCollectYear)
     genbank.dat <- genbank.dat[wi.genbank, ]
     genbank.dat$Species <- 'Mastomys natalensis'
-
+    genbank.dat$min.Year <- genbank.dat$gbCollectYear
+    genbank.dat$max.Year <- genbank.dat$gbCollectYear
+    
     ## Reformat to be compatible with survey data
     genbank.dat.form <- with(genbank.dat,
                              data.frame(Longitude = Long, Latitude = Lat,
-                                        Species = Species, Presence = 1))
+                                        Country = Country,
+                                        Species = Species, Presence = 1,
+                                        Year = gbCollectYear, min.Year = min.Year,
+                                        max.Year = max.Year))
     classi.dat <- rbind.fill(classi.dat, genbank.dat.form)
+    minimum.year = min(classi.dat$min.Year)
 
-    ## Load in GBIF background points of Muridae occurrences. Only keep
-    ## entries that 1) contain non-NA lat/lon, and 2) are not [Species].
-    background.dat <- data.frame(Longitude = raw.dat$decimalLongitude,
+    ###
+    ## Incorporate GBIF background points of Muridae occurrences.
+    background.dat <- data.frame(countryCode = raw.dat$countryCode,
+                                 Longitude = raw.dat$decimalLongitude,
                                  Latitude = raw.dat$decimalLatitude,
-                                 Species = raw.dat$species)
-
-    keep <- !is.na(background.dat$Latitude) & !is.na(background.dat$Longitude) &
-        !is.na(background.dat$Species) & paste(background.dat$Species) != Species
-    background.dat <- background.dat[keep,]
-    background.dat$Presence = 0
-
-    ## Join the Presence and Background data-sets together
-    classi.dat <- rbind.fill(classi.dat, background.dat)
-
-    ## Restrict dataset to those points that occur in the focal countries of West Africa (This
-    ## step does not omit any of the Mastomys natalensis presence data)
-    ## First, load in shapefile of Africa and define focal countries.
+                                 Species = raw.dat$species,
+                                 Genus = raw.dat$genus,
+                                 Year = raw.dat$year,
+                                 min.Year = raw.dat$year,
+                                 max.Year = raw.dat$year,
+                                 basis = raw.dat$basisOfRecord
+                                 )
+    background.dat$countryCode = paste(background.dat$countryCode)
+    
+    ## Replace country codes with country names. First, define the focal countries
+    ## that make up the study region. 
     foc.countries <- c('Mali', "Guinea", "Ivory Coast", "Sierra Leone",
                        "Nigeria", 'Liberia', "Cote d`Ivoire",
                        'Ghana', 'Togo', 'Benin',
                        'Burkina Faso', 'Mauritania', 'Niger', 'Senegal',
                        'Gambia', 'Guinea-Bissau')
 
+    ## Define a table that associates country codes with countries
+    country.codes = data.frame(code = c('ML', 'GN', 'CI', 'SL',
+                                        'NG','LR','CI',
+                                        'GH','TG','BJ',
+                                        'BF','MR','NE','SN',
+                                        'GM','GW'),
+                               country = foc.countries)
+    ## Remove repeated Ivory Coast (kept in foc.countries for later)    
+    country.codes <- country.codes[-which(country.codes$country=="Cote d`Ivoire"),]
+    country.codes$code = paste(country.codes$code)
+    country.codes$country = paste(country.codes$country)
+    
+    ##Only keep entries that
+    ## 1) contain non-NA lat/lon
+    ## 2) have a species entry
+    ## 3) have a species entry other than [Species]
+    ## 4) have year of capture
+    ## 5) have year of capture that is in-line with presence data
+    ## 6) document a rodent that was preserved in some way
+    ## 7) have a country code in the study region
+    ## 8) remove other entries from the genus Mastomys
+    keep <- !is.na(background.dat$Latitude) & !is.na(background.dat$Longitude) &
+        !is.na(background.dat$Species) & paste(background.dat$Species)!="" &
+        paste(background.dat$Species) != Species & !is.na(background.dat$Year) &
+        background.dat$Year >= minimum.year &
+        background.dat$basis %in% c('PRESERVED_SPECIMEN', 'MATERIAL_SAMPLE') &
+        background.dat$countryCode %in% country.codes$code &
+        !is.na(background.dat$Genus) &
+        !(background.dat$Genus %in% c('Mastomys'))
+
+    
+    background.dat <- background.dat[keep,]
+    background.dat$Presence = 0
+
+    ## Join the Presence and Background data-sets together
+    classi.dat <- rbind.fill(classi.dat, background.dat)
+    
+    ## Double check that all points occur in the focal countries of West Africa (This
+    ## step does not omit any of the Mastomys natalensis presence data)
+    
     ## Next, make a temporary spatial points object (dat) out of rodent coordinates.
     ## Extract feature info from locations contained in dat from the africa shape file.
     dat <- data.frame(Longitude = classi.dat$Longitude,
@@ -107,28 +176,42 @@ Prep.Reservoir.Data <- function(Species){
     ## dataset. All predictors are extracted from all.stack.
     points <- cbind(classi.dat$Longitude, classi.dat$Latitude)
     classi.dat <- cbind(classi.dat, raster::extract( all.stack, points, sp = TRUE))
-
+    
     ## Impute any missing values with median
     var.names <- names(all.stack)
     classi.dat <- impute(classi.dat, var.names)
 
-    ## Write the data-set to the Data directory
-    write.table(classi.dat, file = paste0('Data/Prepped_PresAbs_', Species.name, '_Data'),
-                col.names = TRUE, row.names = FALSE)
 
+    ## Finally, transform country codes into country names, remove unnecessary columns
+    mask.bg <- classi.dat$Presence==0
+    Background.countries = sapply(X = which(mask.bg),
+                                  FUN = function(X){country.codes$country[which(classi.dat$countryCode[X]==country.codes$code)]})
+    classi.dat[mask.bg, 'Country'] = Background.countries
+    classi.dat <- classi.dat[,-which(names(classi.dat) %in% c('countryCode','basis'))]
+
+    
+    ## Write the data-set to the Data directory
+    write.csv(classi.dat, file = paste0('Figures_Fits/', prefix, '/',fold,'/',
+                                        'Prepped_PresAbs_', Species.name, '_Data.csv'),
+              row.names = FALSE)
+    
     ## Print number of pixels classified as presences for each species
     print('-- Count Statistics --', quote = FALSE)
-    tab <- table(classi.dat$Species)
-    print(addmargins(tab, FUN = list(Total = sum), quiet = TRUE))
-
-    ## Quick map figure showing pixel [Species] capture locations. Load shapefile for plotting.
-    png(file = paste0('Figures_Fits/', Species.name,'_captures.png'),
+    print(paste0('Number Background: ', sum(classi.dat$Presence==0)), quote = FALSE)
+    print(paste0('Number Presence: ', sum(classi.dat$Presence==1)), quote = FALSE)
+    print(paste0('Collected Between: ', min(classi.dat$min.Year), ' - ', max(classi.dat$max.Year)), quote = FALSE)
+    
+    ## Map figure showing pixel [Species] capture locations. Load shapefile for plotting.
+    png(file = paste0('Figures_Fits/',prefix, '/',fold,'/', Species.name,'_captures.png'),
         width = 6, height = 4, units = 'in', res = 400)
     par(mai = 1*c(0.2,0.2,0.2,0.2))
     plot(foc.shp.ogr, col = 'cornsilk')
     points(Latitude~Longitude, classi.dat[classi.dat$Presence==1,], bg = 'green', col = 'black',
            pch = 21, cex = 0.5)
-    legend(x = 'topleft', legend = 'Confirmed captures', pch = 21, pt.bg = 'green', col = 'black')
+    points(Latitude~Longitude, classi.dat[classi.dat$Presence==0,], col = 'black',
+           pch = 4, cex = 0.5)
+    legend(x = 'topleft', legend = c('Confirmed captures', 'Background'), pch = c(21,4),
+           pt.bg = c('green',NA), col = 'black')
     dev.off()
 
     return(classi.dat)

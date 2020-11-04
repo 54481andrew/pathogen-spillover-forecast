@@ -47,13 +47,15 @@ Calc.Sig.Reservoir.Preds <- function(Species, dataset){
             print(p)
         })
     }
-    pdf(file = paste0('Figures_Fits/Sig_Reservoir_Predictors_',Species.name,'.pdf'),
+    pdf(file = paste0('Figures_Fits/', prefix, '/',fold,'/',
+                      'Sig_Reservoir_Predictors_',Species.name,'.pdf'),
         width = 25, height = 15)
     grid.arrange(grobs = graph.list)
     dev.off()
     
     ## Write significant predictor names to file.
-    write.table(sig.var.names, file = paste0('Figures_Fits/Sig_Reservoir_Preds_',Species.name),
+    write.csv(sig.var.names, file = paste0('Figures_Fits/', prefix, '/',fold,'/',
+                                             'Sig_Reservoir_Preds_',Species.name,'.csv'),
                 row.names = FALSE)
 
     return(sig.var.names)
