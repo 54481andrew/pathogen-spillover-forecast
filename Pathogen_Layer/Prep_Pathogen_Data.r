@@ -3,6 +3,13 @@
 ## of rodent Lassa presence/absence data. The rodent dataframe contains
 ## environmental predictors that are used to train the pathogen layer of
 ## the model.
+## Certain hyper-parameters defined in Generate_Pathogen_Layer.r determine
+## how the data will be processed. Specifically, [min.test] determines the
+## number of rodents that need to be tested to call a site LASV-; if [min.test]
+## rodents are tested and none have LASV exposure, the pixel is classified as
+## LASV-. [set.ambiguous.to] determines how pixels without virus detection, but
+## with seropositive rodents, are handled. The natural choices are NA (omitted)
+## or 1 (counted as LASV+). 
 
 Prep.Pathogen.Data <- function(hypers.i){
     
@@ -10,13 +17,15 @@ Prep.Pathogen.Data <- function(hypers.i){
     full.dat <- read.csv(file = 'Data/Cleaned_Lassa_Literature.csv', stringsAsFactors = FALSE,
                          sep = '\t')
     
-    ## Combine Genus and Species columns into single column Species (v10)
+    ## Combine Genus and Species columns into single column Species
     full.dat$Species = with(full.dat, paste(Genus, Species, sep = ' '))
     
     ## Calculate proportion infected and proportion seropositive for all entries
     full.dat$PropVirus <- full.dat$NumPosVirus/full.dat$NumTestVirus
     full.dat$PropAb <- full.dat$NumPosAb/full.dat$NumTestAb
 
+    ## The human entries in the data-set all come from sero-surveys that
+    ## sample a random human population
     full.dat$Human_Random_Survey = full.dat$Species== 'Homo sapiens'
 
     ## Keep only those columns that are needed, and discard any entries
@@ -34,9 +43,11 @@ Prep.Pathogen.Data <- function(hypers.i){
     keep <- !(is.na(full.dat$Latitude) | is.na(full.dat$Longitude))
     classi.dat <- full.dat[keep,]
     
-    ## Add columns describing total individuals tested (TotTest), total
+    ## Add columns describing total individuals tested (TotTest), and total
     ## number of individuals that were arenavirus positive (TotPos).
     classi.dat = add.total.columns(classi.dat, hypers.i$min.test)
+
+    ## Specify that these data are not from genbank
     classi.dat$genbank <- FALSE
     
     ## -- Incorporate GenBank dataset into classi.dat
@@ -91,7 +102,8 @@ Prep.Pathogen.Data <- function(hypers.i){
     classi.dat.jrod <- classi.dat[classi.dat$Species=='Mastomys natalensis', ]
     human.test.dat <-  classi.dat[classi.dat$Human_Random_Survey==TRUE &
                                   classi.dat$NumTestAb > 0, ]
-    ## Add ArenaStat column based on serology. This is only used for graphing. 
+    ## Add ArenaStat column based on serology. This is used to define LASV status
+    ## in the rodents. For the human data, this is only used for graphing. 
     human.test.dat$ArenaStat <- 1*(human.test.dat$NumPosAb > 0)
 
     
@@ -103,11 +115,12 @@ Prep.Pathogen.Data <- function(hypers.i){
     purged.out <- purge.repeats(classi.dat.jrod, template.rast)
     jrod.purged <- purged.out[[1]]
 
-
+    ## -----------------
+    
     ## Keep track of the number of pixels that are 
     ## ambiguous given our definition of LASV +. Column names refer to the
     ## literature data except for those with suffix y refers to genbank.
-    ##These are pixels in which not enough rodents were tested, or were serology-only.
+    ## These are pixels in which not enough rodents were tested, or were serology-only.
     classi.dat.jrod$Cell <- raster::extract(template.rast,
                                             classi.dat.jrod[,c('Longitude','Latitude')],
                                             cellnumbers=TRUE)[,'cells']
@@ -131,14 +144,14 @@ Prep.Pathogen.Data <- function(hypers.i){
     ## Points with confirmed LASV virus from genbank are not ambiguous, so remove them
     ambiguous.data <- merged.ambiguous.data[merged.ambiguous.data$NumPosVirus.y==0,]
 
-## -----------------
+    ## -----------------
     
     ## Define sites as positive or negative or NA for arenavirus (indicated in ArenaStat column).
     
     ## Three kinds of sites are negative (meet minimum # tested, all tested are negative),
-    ## positive (1 or more confirmed LASV infection), and ambiguous (positive serology
-    ## without virus explicitly detected). Ambiguous sites are set
-    ## according to set.ambiguous.sites option in hypers.dat
+    ## positive (1 or more rodent with Lassa virus detected), and ambiguous (positive serology
+    ## with no virus explicitly detected). Ambiguous sites are set according to
+    ## set.ambiguous.sites option in hypers.dat
     jrod.purged$ArenaStat <- NA
     mask.neg <- jrod.purged$TotTest >= hypers.i$min.test & jrod.purged$NumPosVirus ==0 &
         jrod.purged$NumPosAb ==0
@@ -149,15 +162,13 @@ Prep.Pathogen.Data <- function(hypers.i){
     jrod.purged[mask.neg, 'ArenaStat'] <- 0
     jrod.purged[mask.ambi, 'ArenaStat'] <- hypers.i$set.ambiguous.to
 
-    ## Collect NA values again for removal. Save the sites that have been left ambiguous (NA)
-    mask.na <- is.na(jrod.purged$ArenaStat)
-
     ## Save ambiguous pixels for debugging purposes
     ambiguous.pixels <- jrod.purged[mask.ambi,c()]
     
-    ## Exclude any entries from jrod.purged that still have NA ArenaStat
+    ## Now that ambiguous entries have been set to what the user wants, exclude any entries
+    ## from jrod.purged that still have NA ArenaStat
+    mask.na <- is.na(jrod.purged$ArenaStat)
     jrod.purged <- jrod.purged[!mask.na,]
-
     
     ## Change coordinates to be at cell center
     orig.points <- cbind(jrod.purged$Longitude, jrod.purged$Latitude)
@@ -177,11 +188,14 @@ Prep.Pathogen.Data <- function(hypers.i){
 
     ## Save a copy of rodent presence/absence dataset, as well as the human seroprevalence data
     write.csv(jrod.purged, file = paste0('Figures_Fits/', prefix, '/',fold,'/',
-                                         'Prepped_Pathogen_PresAbs_Data.csv'), row.names = FALSE)
+                                         'Prepped_Pathogen_PresAbs_Data.csv'),
+              row.names = FALSE)
     write.csv(ambiguous.data, file = paste0('Figures_Fits/', prefix, '/',fold,'/',
-                                         'Prepped_Pathogen_Ambiguous_Data.csv'), row.names = FALSE)
+                                            'Prepped_Pathogen_Ambiguous_Data.csv'),
+              row.names = FALSE)
     write.csv(ambiguous.pixels, file = paste0('Figures_Fits/', prefix, '/',fold,'/',
-                                         'Prepped_Pathogen_Ambiguous_Pixels.csv'), row.names = FALSE)
+                                              'Prepped_Pathogen_Ambiguous_Pixels.csv'),
+              row.names = FALSE)
     write.csv(human.test.dat, file = paste0('Figures_Fits/', prefix, '/',fold,'/',
                                             'Prepped_Human_Seroprevalence_Data.csv'),
               row.names = FALSE)
@@ -199,7 +213,8 @@ Prep.Pathogen.Data <- function(hypers.i){
     ## Time span
     temp <- with(human.test.dat, strsplit(paste(Year), '-'))
     years = sapply(temp, FUN = function(x){range(as.numeric(x))})
-    print(paste0('Human seroprevalence collected between ', paste(range(years), collapse = '-')), quote = FALSE)
+    print(paste0('Human seroprevalence collected between ', paste(range(years), collapse = '-')),
+          quote = FALSE)
     
     png(file = paste0('Figures_Fits/', prefix, '/',fold,'/',
                       'Human_Test_Dat.png'), width = 6, height = 4, units = 'in', res = 400)

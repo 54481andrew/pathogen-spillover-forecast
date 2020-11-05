@@ -1,14 +1,6 @@
 ## This script produces a map containing points that indicate the location of rodent
 ## LASV surveys, and points that indicate the location of human LASV sero-surveys.
 
-## Load in packages for GIS, plotting, and binding dataframes
-require(rgdal)
-require(sf)
-require(raster)
-require(ggthemes)
-require(ggplot2)
-require(plyr)
-
 ## Load processed rodent dataset
 classi.dat.rod <- read.csv(file = paste0('Figures_Fits/', prefix, '/',fold,'/',
                                          'Prepped_Pathogen_PresAbs_Data.csv'))
@@ -24,10 +16,12 @@ which.humans <- classi.dat$Species=='Homo sapiens'
 
 ## Read in shape files of focal countries into spatial data frame
 storage.fold <- '../Storage'
-foc.shp.ogr <- readOGR(dsn = paste(storage.fold, '/Shapefiles/West_Africa', sep = ''), layer = 'foc', verbose = FALSE)
+foc.shp.ogr <- readOGR(dsn = paste(storage.fold, '/Shapefiles/West_Africa', sep = ''),
+                       layer = 'foc', verbose = FALSE)
 
 ## Read in shapefile of Mastomys natalensis distribution, crop to West Africa
-masto.rangemap <-readOGR(dsn = paste(storage.fold, '/Shapefiles/Masto_Range', sep = ''), layer = 'data_0', verbose = FALSE)
+masto.rangemap <-readOGR(dsn = paste(storage.fold, '/Shapefiles/Masto_Range', sep = ''),
+                         layer = 'data_0', verbose = FALSE)
 masto.rangemap <- crop(masto.rangemap, foc.shp.ogr)
 
 ## Organize dataset for plotting
@@ -76,6 +70,7 @@ scale_fill_manual(name = "Population & Status",
           legend.position = 'right') +
     xlab('Longitude') + ylab('Latitude')
 g1
+
 ## These countries are highlighted gray in the inset map
 foc.countries <- c('Mali', "Guinea", "Ivory Coast", "Sierra Leone",
                    "Nigeria", 'Liberia',
@@ -99,6 +94,7 @@ theme(panel.background = element_rect(fill = 'white', color = 'black'),
       ) +
     scale_fill_manual(values = c("brown", "grey")) + borders()
 )
+
 ## Put main map and inset together
 g3 <- g1 +
       annotation_custom(grob = g2, xmin = 5, xmax = 15,

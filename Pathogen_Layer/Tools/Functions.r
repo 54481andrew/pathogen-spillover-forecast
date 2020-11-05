@@ -137,7 +137,6 @@ purge.repeats <- function(dat, template){
 }## End Function
 
 
-
 ## Generate a folder name for tree with specified properties
 generate.lassa.name <- function(hypers.i){
     fold.name <- with(hypers.i, paste('pa_nboots', nboots,

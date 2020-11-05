@@ -236,21 +236,6 @@ train.pathogen.learners <- function(rodlsv.survey.dat, hypers.i = NULL){
                             '/Effect_Response_Lassa.png', sep = ''),
            device = 'png', width = 7, height = 5, units = 'in')
 
-    ## ggplot(data = response.dat) + 
-    ##     stat_summary_bin(aes(x = Value, y = Effect, group = var.pretty),
-    ##                      fun.data = mean_se, fun.args = list(mult = 2),
-    ##                      color = "black", fill = 'blue', linetype = 'dashed',
-    ##                      geom = 'ribbon', bins = 30) +
-    ##     theme_classic() +
-    ##     stat_summary_bin(aes(x = Value, y = Effect, group = var.pretty),
-    ##                      geom = 'line', size = 1, fun = mean) +
-    ##     facet_wrap(~var.pretty, ncol = 3, nrow = 2, scales = 'free') + xlab('Predictor Value') +
-    ##     ylab('Classification Score')
-    ## ggsave(filename = paste('Figures_Fits/', prefix, '/', fold,
-    ##                         '/Effect_Response_Lassa_var.png', sep = ''),
-    ##        device = 'png', width = 7, height = 5, units = 'in')
-    
-    
     ## Plot risk map averaged over all boot predictions
     heat.cols <- viridis(120, begin = 0.1, end = 1, option = 'D')
     xlims = c(-18,16)

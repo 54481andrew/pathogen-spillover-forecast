@@ -15,10 +15,12 @@ require(sf)
 require(fields)
 require(verification)
 require(ggplot2)
+require(ggthemes)
 require(plyr)
 options("rgdal_show_exportToProj4_warnings"="none") ## Turn off gdal warnings
 require(rgdal)
 require(viridis)
+
 
 ## Directory name that will contain output for all hyperparameter sets
 prefix <- 'pathogen_v3'
@@ -48,6 +50,8 @@ source("Train_Pathogen_Learners.r")
 
 ## Set hyperparameters.
 ## nboots - number of times the data is sampled and the model fit
+## set.ambiguous.to - NA or 1; what to do with pixels with no LASV virus detected but + rodent serology
+## min.test - minimum number of tested rodents required for (LASV-) pixel status. 
 ## tree.complexity - depth of trees that are fit at each model iteration
 ## mllr - minus log10 of the learning rate
 ## lmt - log10 of the max.trees parameter
@@ -80,10 +84,10 @@ for(ii in 1:nrow(hypers.dat)){
     }
     dir.create(models.folder,showWarnings = FALSE)
     
-    ## Prep the Mastomys natalensis LASV occurrence dataset
+    ## Prep the Mastomys natalensis LASV occurrence dataset and human serosurvey data
     rodlsv.survey.dat <- Prep.Pathogen.Data(hypers.dat[ii,])[[1]]
 
-    ## Maps the prepared dataset
+    ## Map the prepared dataset
     source("Map_Cases.r")
     
     ## Predictors that are deemed significant by the Wilcox test
