@@ -32,15 +32,13 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
     Species = paste(hypers.i$Species)
     Abbrev.name <- paste0(substr(paste(Species),1,1),
                           substr(strsplit(paste(Species),' ')[[1]][2],1,1))
-
     nboots = hypers.i$nboots
     tree.complexity = hypers.i$tree.complexity
     num.bg.points = hypers.i$num.bg.points
     learning.rate <- 10^-hypers.i[,'mllr']
     max.trees <- 10^hypers.i[,'lmt']
 
-    ## Generate directory name where all output will be saved
-    fold <- generate.res.name(hypers.i)
+    ## Print model name
     cat(paste0('\n\n\n\n'))
     print(paste('--------- Model fit name:', fold, '-------------'), quote = FALSE)
 
@@ -150,7 +148,7 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
                                      y = test.dataset[,c('Longitude', 'Latitude')])
         tree.dat$model.oob.auc.pwd <- roc.area(test.dataset$Presence, model.predictions)$A
 
-        ### ADD IN ASSESSMENT BY SPECIES
+        ### Assess by species for internal use 
 
         spec.names <- unique(paste(dataset$Species))
         spec.dat <- matrix(nrow = 1, ncol = 2*length(spec.names))
@@ -238,8 +236,6 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
                     names(new.dat) <- c('x', 'y', 'boot', 'var')
                     response.dat <- rbind(response.dat,
                                           new.dat)
-
-
                 }## Loop through predictors
             })## End try
         } ## Check if the file exists
@@ -273,7 +269,8 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
     ## Choose the six top predictors
     response.dat <- response.dat[response.dat$var.pretty %in% vars.to.plot.pretty,]
 
-    ## Make it so that for each predictor, the range of the predictor values in 
+    ## Extend the range of each response-predictor function to the full range for
+    ## that predictor.
     for(pred in unique(response.dat$var)){
         min.pred <- min(response.dat[response.dat$var==pred,'x'])
         max.pred <- max(response.dat[response.dat$var==pred,'x'])
@@ -291,7 +288,7 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
     ## Rename for ggplot graph
     response.dat$Effect = response.dat$y
     response.dat$Value = response.dat$x
-
+    
     ggplot(data = response.dat[response.dat$var.pretty %in% vars.to.plot.pretty,]) +
         geom_line(aes(x = Value, y = Effect, group = boot), size = 0.05) +
         theme_classic() +
@@ -301,22 +298,7 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
         ylab('Classification Score')
     ggsave(filename = paste('Figures_Fits/', prefix, '/', fold, '/Effect_Response_', Abbrev.name,'.png', sep = ''),
            device = 'png', width = 7, height = 5, units = 'in')
-
-
-    ## ggplot(data = response.dat[response.dat$var.pretty %in% vars.to.plot.pretty,]) +
-    ##     stat_summary_bin(aes(x = Value, y = Effect, group = var.pretty),
-    ##                      fun.data = mean_se, fun.args = list(mult = 2),
-    ##                      color = "black", fill = 'blue',
-    ##                      geom = 'ribbon', bins = 30) +
-    ## theme_classic() +
-    ##     stat_summary_bin(aes(x = Value, y = Effect, group = var.pretty),
-    ##                      geom = 'line', size = 1, fun = mean, fun.args = list(na.rm = TRUE)) +
-    ##     facet_wrap(~var.pretty, ncol = 3, nrow = 2, scales = 'free') + xlab('Predictor Value') +
-    ##     ylab('Classification Score')
-    ## ggsave(filename = paste('Figures_Fits/', prefix, '/', fold, '/Effect_Response_', Abbrev.name,'_var.png', sep = ''),
-    ##        device = 'png', width = 7, height = 5, units = 'in')
-
-
+    
     ## Plot risk map averaged over all boot predictions
     heat.cols <- viridis(120, begin = 0.1, end = 1, option = 'D')
     xlims = c(-18,16)

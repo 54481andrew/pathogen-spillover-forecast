@@ -23,19 +23,9 @@ train.pathogen.learners <- function(rodlsv.survey.dat, hypers.i = NULL){
     learning.rate <- 10^(-hypers.i[,'mllr']) ## Learning rate in the model
     max.trees <- 10^hypers.i[,'lmt'] ## Max number of trees in the model: 100000
 
-    ## Generate directory name where all output will be saved
-    fold <- generate.lassa.name(hypers.i)
+    ## Print model name
     cat(paste0('\n\n\n\n'))
     print(paste('--------- Model fit name:', fold, '-------------'), quote = FALSE)
-
-    ## Create data directories
-    dirpath <- paste('Figures_Fits/',prefix,sep='')
-    if(!dir.exists(dirpath)){dir.create(dirpath, showWarnings = FALSE)}
-    dirpath <- paste('Figures_Fits/', prefix, '/', fold,sep='')
-    if(!dir.exists(dirpath)){dir.create(dirpath, showWarnings = FALSE)}
-    models.folder = paste0('Figures_Fits/', prefix, '/', fold, '/Models')
-    unlink(models.folder, recursive = TRUE)
-    dir.create(models.folder,showWarnings = FALSE)
 
     num.survey <- nrow(rodlsv.survey.dat)
 
@@ -140,13 +130,6 @@ train.pathogen.learners <- function(rodlsv.survey.dat, hypers.i = NULL){
     writeRaster(pred.rast, file = paste("Figures_Fits/", prefix, '/', fold,"/Lassa_Layer_",
                                         fold,".tif", sep = ''), overwrite = TRUE)
 
-    ## Store and plot the 95% CI of the fits as well
-    quantile.fun <- function(x){quantile(x, probs = c(0.05,0.95), na.rm = TRUE)}
-    CI.stack <- overlay(pred.stack, fun = quantile.fun)
-    writeRaster(CI.stack, file = paste("Figures_Fits/", prefix, '/', fold,"/Lassa_Layer_",
-                                        fold,"_CI.tif", sep = ''), overwrite = TRUE)
-
-
     ## The code below extracts variable importance ranking and the learned relationships
     imp.mat <- matrix(NA, nrow = length(var.names), ncol = nboots)
     imp.dat <- data.frame(coef = NA, imp = NA)
@@ -206,7 +189,8 @@ train.pathogen.learners <- function(rodlsv.survey.dat, hypers.i = NULL){
     ## Choose the six top predictors
     response.dat <- response.dat[response.dat$var.pretty %in% vars.to.plot.pretty,]
 
-    ## Make it so that for each predictor, the range of the predictor values in 
+    ## Extend the range of each response-predictor function to the full range for
+    ## that predictor.
     for(pred in unique(response.dat$var)){
         min.pred <- min(response.dat[response.dat$var==pred,'x'])
         max.pred <- max(response.dat[response.dat$var==pred,'x'])
@@ -260,49 +244,6 @@ train.pathogen.learners <- function(rodlsv.survey.dat, hypers.i = NULL){
            bty = 'n')
     dev.off()
 
-    ## Plot risk map 95% CI across all boot predictions
-    heat.cols <- viridis(120, begin = 0.1, end = 1, option = 'D')
-    xlims = c(-18,16)
-    ylims = c(16, 16.5)
-    points.lasv <- rodlsv.survey.dat[,c('Longitude', 'Latitude')]
-    CI.stack = mask(CI.stack, masto.rangemap, updatevalue = 0)
-    png(file = paste('Figures_Fits/', prefix, '/', fold, '/Lassa_Risk_Layer_CIup.png', sep = ''),
-        width = 6, height = 4, units = 'in', res = 400)
-    par(mai = 1*c(0.2,0.2,0.2,0.6))
-    image.plot(CI.stack[[2]], col = heat.cols, zlim = c(0,1),
-               bty = 'n', xlab = '', ylab = '', xaxt = 'n', yaxt = 'n',
-               xlim = xlims, ylim = ylims,
-               asp = 1, legend.lab = 'Occurrence score', legend.line = 2.5,
-               main = '')
-    mtext(text = expression('Lassa 95% Quantile'), side = 3, line = -1)
-    points(points.lasv[,1], points.lasv[,2], asp = 1, cex = 1, pch = 21,
-           lwd = 1, bg = c('white', 'red')[rodlsv.survey.dat[,'ArenaStat'] + 1], col = 'black')
-    plot(foc.shp.ogr, add = TRUE, bty = 'n', asp = 1)
-    plot(rgeos::gIntersection(foc.shp.ogr, masto.rangemap), add = TRUE, bty = 'n', asp = 1, lwd = 3)
-    legend(x = 'bottomleft', legend = c('LASV -', 'LASV +'),
-           pt.bg = c('white', 'red'), pch = 21, pt.lwd = 1, col = 'black', cex = 1,
-           bty = 'n')
-    dev.off()
-
-    png(file = paste('Figures_Fits/', prefix, '/', fold, '/Lassa_Risk_Layer_CIdown.png', sep = ''),
-        width = 6, height = 4, units = 'in', res = 400)
-    par(mai = 1*c(0.2,0.2,0.2,0.6))
-    image.plot(CI.stack[[1]], col = heat.cols, zlim = c(0,1),
-               bty = 'n', xlab = '', ylab = '', xaxt = 'n', yaxt = 'n',
-               xlim = xlims, ylim = ylims,
-               asp = 1, legend.lab = 'Occurrence score', legend.line = 2.5,
-               main = '')
-    mtext(text = expression('Lassa 5% Quantile'), side = 3, line = -1)
-    points(points.lasv[,1], points.lasv[,2], asp = 1, cex = 1, pch = 21,
-           lwd = 1, bg = c('white', 'red')[rodlsv.survey.dat[,'ArenaStat'] + 1], col = 'black')
-    plot(foc.shp.ogr, add = TRUE, bty = 'n', asp = 1)
-    plot(rgeos::gIntersection(foc.shp.ogr, masto.rangemap), add = TRUE, bty = 'n', asp = 1, lwd = 3)
-    legend(x = 'bottomleft', legend = c('LASV -', 'LASV +'),
-           pt.bg = c('white', 'red'), pch = 21, pt.lwd = 1, col = 'black', cex = 1,
-           bty = 'n')
-    dev.off()
-
-    
     ## Remove fitted models
     unlink(models.folder, recursive = TRUE)
 

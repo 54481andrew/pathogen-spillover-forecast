@@ -4,17 +4,15 @@
 ## background captures of other Murids.
 
 Prep.Reservoir.Data <- function(Species){
-    ## Load in [Species] occurrence dataset. Keep only those columns that are needed,
-    ## and discard any entries without Lat/Lon values. The data-set is called classi.dat, short
-    ## for classification data-set.
+    ## Load in [Species] occurrence dataset. Discard any entries without Lat/Lon values.
+    ## The data-set is called classi.dat, short for classification data-set.
     Species.name = gsub(' ', '_', Species)
     presence.data = read.table(file = paste0('Data/', Species.name, '_presences.csv'),
                                sep = "\t", header = TRUE, stringsAsFactors = FALSE)
     presence.data$Latitude = as.numeric(presence.data$Latitude)
     presence.data$Longitude = as.numeric(presence.data$Longitude)
 
-    ## Make "Year" entry a range with minYear and maxYear
-    ## Remove entries without year
+    ## Make "Year" entry a range with minYear and maxYear. Remove entries without year
     presence.data$Year = as.character(presence.data$Year)
     keep <- presence.data$Year!=""
     presence.data <- presence.data[keep,]
@@ -32,16 +30,11 @@ Prep.Reservoir.Data <- function(Species){
     }
     presence.data$Year <- as.numeric(presence.data$Year)
 
-    ##    keep <- c('Species', 'Latitude', 'Longitude', 'Country', 'Confidence')
+    ## Keep only those columns that are needed
     keep <- c('Latitude', 'Longitude', 'Country', 'Species', 'Year', 'min.Year', 'max.Year')
     dat.1 <- presence.data[,keep]
     classi.dat <- dat.1[which(!is.na(dat.1$Longitude) & !is.na(dat.1$Latitude)),]
 
-    ## Only keep entries that are high confidence (species id is based on
-    ## cytochrome b, rather than based on morphology).
-    ## keep <- which(classi.dat$Confidence=='high')
-    ## classi.dat <- classi.dat[keep,]
-    
     ## Add column indicating that these are Presence data
     classi.dat$Presence = 1
 

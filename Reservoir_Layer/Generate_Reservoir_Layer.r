@@ -47,13 +47,6 @@ masto.rangemap <-readOGR(dsn = paste(storage.fold, '/Shapefiles/Masto_Range', se
 raw.dat <- read.csv('Data/GBIF_Background_Murid_Data.csv', sep = "\t",
                     stringsAsFactors = FALSE)
 
-## ## Anna's occurrence data
-## raw.dat <- read.csv('Data/occurrence_trimcols.csv', sep = ",", stringsAsFactors = FALSE)
-## raw.dat$decimalLongitude <- as.numeric(raw.dat$decimalLongitude)
-## raw.dat$decimalLatitude <- as.numeric(raw.dat$decimalLatitude)
-## sum(is.na(raw.dat$decimalLatitude))
-## sum(is.na(raw.dat$countryCode))
-
 ## Additional functions that prep the data and predictors
 source("Tools/Functions.r")
 source('Prep_Reservoir_Data.r')
@@ -126,31 +119,3 @@ for(ii in 1:nrow(hypers.dat)){
 
 print(paste0('Run time: ', Sys.time() - starttime))
 
-
-
-a = read.table(file = paste('Figures_Fits/', prefix, '/', fold, '/assess.dat', sep = ''))
-spec.names = unique(paste(classi.dat.rod$Species))
-meana = a[,1:length(spec.names)]
-names(meana) = spec.names
-
-sda <- a[,-c(1:length(spec.names))]
-names(sda) = spec.names
-
-dat <- data.frame(mean = colMeans(meana, na.rm = TRUE),
-                  sd = colMeans(sda, na.rm = TRUE))
-dat[order(dat$mean),]
-
-spec.names[order(rowMeans(meana, na.rm = TRUE))]
-
-
-
-## ## Check against anna's
-## keep <- !is.na(raw.dat$decimalLatitude) & !is.na(raw.dat$decimalLongitude) &
-##     !is.na(raw.dat$species) & paste(raw.dat$species)!="" &
-##     paste(raw.dat$species) != Species & !is.na(raw.dat$year) &
-##     raw.dat$year >= minimum.year &
-##     raw.dat$basisOfRecord %in% c('PRESERVED_SPECIMEN', 'MATERIAL_SAMPLE') &
-##     raw.dat$countryCode %in% country.codes$code &
-##     !is.na(raw.dat$genus) &
-##     !(raw.dat$genus %in% c('Mastomys'))
-## nrow(raw.dat[keep,])
