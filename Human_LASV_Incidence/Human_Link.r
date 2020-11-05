@@ -33,22 +33,27 @@ set.seed(1)
 ## grid.name specifies the location of the directory to which the regression
 ## results are written. Prefix names specify where the target .tif files that
 ## describe reservoir and pathogen risk are located.
-grid.name <- 'human_v3_ambiNA' ## name for model.dat dataframe
+## The pathogen layer was run in two ways that differed on how ambiguous
+## pixels were handled. These were set to NA or 1; [set.ambiguous.to]
+## allows the user to choose which pathogen layer fit is used for the human
+## predictions. 
+set.ambiguous.to <- NA
+grid.name <- paste0('human_v3_ambi',set.ambiguous.to) ## name for model.dat dataframe
 prefix.masto <- 'reservoir_v3' ## prefix used in Generate_Reservoir_Layer
 masto.fold <- 'Mn_pa_nboots_25_nbg_Same_tc_1_mllr_2_lmt_7'
 
 prefix.lassa <-  'pathogen_v3' ## prefix used in Generate_Lassa_Layer
-lassa.fold <- "pa_nboots_25_1_mllr_3_lmt_7_ambi_NA_mintest_5"
+lassa.fold <- paste0("pa_nboots_25_1_mllr_3_lmt_7_ambi_", set.ambiguous.to, "_mintest_5")
 
 
 ## Load additional functions
 source("Tools/Functions.r")
 
-## Parameters for calculating incidence of human LASV from human LASV seroprevalence
-## Time units are years.
+## Parameters for calculating incidence of human LASV from human LASV seroprevalence.
+## All time units are years.
 LS.rast <- raster("../Storage/Raster_Data/Lifespan.tif") ## Lifespans in West Africa (WorldBank)
 gam = 12 ## LASV recovery is 1 month
-lam.mcc87 = 0.064 ## from McCormick, Webb, Krebs, 1987
+lam.mcc87 = 0.064 ## Seroreversion rate from McCormick, Webb, Krebs, 1987
 mu = 0.02 ## LASV mortality, Pr(Infected dies) = 0.02, from McCormick, Webb, Krebs, 1987
 
 ## Load in Africa shapefiles needed for plotting
@@ -61,9 +66,7 @@ masto.rangemap <-readOGR(dsn = paste(storage.fold, '/Shapefiles/Masto_Range',sep
                          layer = 'data_0', verbose = FALSE)
 
 
-## Next, use equations derived in the mathematica file to convert seroprevalence
-## into human incidence. First step is to load in human population data,
-## which is in compressed format.
+## Load in and uncompress human population data.
 unzip('../Storage/Raster_Data/Rast_Population_AFR_PPP_2020_adj_v2.tif.zip',
       exdir = '../Storage/Raster_Data')
 pop.rast <- raster('../Storage/Raster_Data/Rast_Population_AFR_PPP_2020_adj_v2.tif')
@@ -121,38 +124,20 @@ dev.off()
 
 ## ---- Regress human seroprevalence on D_X layer
 
-## Extract predictions from each layer at each human sero-survey location
+## Extract risk prediction Dx from each human sero-survey location
 human.test.dat$Dx <- extract(Dx, human.test.dat[,c('Longitude', 'Latitude')])
 
 ## Fit a standard binomial as a baseline
 bin.mod <- glm(PropAb~ 1 + Dx, human.test.dat,
               family = 'binomial',
               weights = NumTestAb)
-summary(bin.mod)
-## Coefficients:
-##             Estimate Std. Error z value Pr(>|z|)    
-## (Intercept) -2.01988    0.04950  -40.81   <2e-16 ***
-## Dx           0.99637    0.08419   11.83   <2e-16 ***
-
+bin.summ <- summary(bin.mod)
 
 ## Fit quasi-binomial model
 qb.mod <- glm(PropAb~ 1 + Dx, human.test.dat,
               family = 'quasibinomial',
               weights = NumTestAb)
-summary(qb.mod)
-## Coefficients:
-##             Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)  -2.0199     0.2014 -10.029  < 2e-16 ***
-## Dx            0.9964     0.3426   2.908  0.00449 ** 
-
-
-## Calculate correlation
-cor(qb.mod$fitted.values, qb.mod$y)
-## 0.23
-cov.wt(cbind(qb.mod$fitted.values, qb.mod$y), wt = human.test.dat$NumTestAb,
-                        cor = TRUE)$cor
-## 0.46
-
+qbin.summ <- summary(qb.mod)
 
 ## --- Use regression model to predict human LASV seroprevalence across West Africa
 pred.stack <- stack(Dx)
@@ -165,13 +150,10 @@ human.test.dat$fitted <- extract(x = pred.rast,
                           y = human.test.dat[,c('Longitude', 'Latitude')])
 
 ## Compute confidence intervals
-std.dev <- sd(qb.mod$residuals)
-ci.level <- 0.9 ## 90% CI
-crit <- qnorm(1 - (1-ci.level)/2)
+
+## Define some variables that are used in graphing
 xseq <- seq(0,1,by = 0.01)
 y.linear <- xseq*qb.mod$coefficients['Dx'] + qb.mod$coefficients['(Intercept)']
-y.up <- y.linear + crit*std.dev
-y.down <- y.linear - crit*std.dev
 ilogit <- function(x){exp(x)/(1 + exp(x))} ## inverse logit will come in handy
 
 ## Bootstrap confidence intervals
@@ -190,7 +172,7 @@ f <- function(seed){
     boot.pred <- predict(bin.mod, newdata = data.frame(Dx = seq(0,1,by = 0.01)), type = 'response')
     return(boot.pred)
 }
-boot.out <- sapply(X = 1:100, FUN = f)
+boot.out <- sapply(X = 1:1000, FUN = f)
 ## Find 100x[xconf]% confidence intervals
 xconf <- 0.95
 quantile.fun <- function(boot.row){
@@ -216,68 +198,7 @@ matlines(xseq, conf.out, col = 'red', lty = 2)
 dev.off()
 
 
-## ## ----- METHOD 2
-
-## ## Bootstrap confidence intervals
-## f <- function(seed){
-##     ## Set seed for reproducibility
-##     set.seed(seed) 
-##     ## Choose a random set of surveys
-##     boot.set <- sample(nrow(human.test.dat), replace = TRUE)
-##     boot.dat <- human.test.dat[boot.set,]
-##     ## The Quasibinomial and binomial GLM give the same mean predictions,
-##     ## so we use the binomial GLM. 
-##     bin.mod <- glm(PropAb~ 1 + Dx, boot.dat,
-##                    family = 'binomial',
-##                    weights = NumTestAb)
-##     ## Return predictions
-##     ##boot.pred <- predict(bin.mod, newdata = data.frame(Dx = seq(0,1,by = 0.01)), type = 'response')
-##     return(as.numeric(coef(bin.mod)))
-## }
-## boot.out <- sapply(X = 1:100, FUN = f)
-## boot.out <- t(boot.out)
-## ## Find 100x[xconf]% confidence intervals
-## xconf <- 0.95
-## Intercept.int <- quantile(boot.out[,1],
-##          probs = c((1-xconf)/2, 1-(1-xconf)/2))
-## Dx.int <- quantile(boot.out[,2],
-##          probs = c((1-xconf)/2, 1-(1-xconf)/2))
-## sc = 0.01 ## Scaling of points
-## png(filename = paste(fold.name,'/Pred_vs_Fit_altci2.png',sep=''),
-##     width = 4, height = 4, units = 'in', res = 400)
-## par(mar = c(3.25,3.25,0.5,0.5))
-## plot(PropAb~Dx, data = human.test.dat, cex = sc*NumTestAb,
-##      xlab = '', ylab = '',
-##      main = '', ylim = c(0,0.6), xlim = c(0,0.85))
-## mtext(side = 1, text = as.expression(bquote('D'['x']~'Layer')), line = 2.4)
-## mtext(side = 2, text = 'Seroprevalence', line = 2.4)
-## legend(x = 'topleft', legend = c('10', '100', '400'), pch = c(1,1,1), pt.cex = sc*c(10,100,400))
-## lines(xseq, ilogit(y.linear), col = 'black', lty = 1)
-## lines(xseq, ilogit(Dx.int[1]*xseq + Intercept.int[1]), col = 'red', lty = 3)
-## lines(xseq, ilogit(Dx.int[2]*xseq + Intercept.int[2]), col = 'red', lty = 3)
-## dev.off()
-
-
-
-## ## THIS IS A PREDICTION INTERVAL
-## sc = 0.01 ## Scaling of points
-## png(filename = paste(fold.name,'/Pred_vs_Fit.png',sep=''),
-##     width = 4, height = 4, units = 'in', res = 400)
-## par(mar = c(3.25,3.25,0.5,0.5))
-## plot(PropAb~Dx, data = human.test.dat, cex = sc*NumTestAb,
-##      xlab = '', ylab = '',
-##      main = '', ylim = c(0,0.6), xlim = c(0,0.85))
-## mtext(side = 1, text = as.expression(bquote('D'['x']~'Layer')), line = 2.4)
-## mtext(side = 2, text = 'Seroprevalence', line = 2.4)
-## legend(x = 'topleft', legend = c('10', '100', '400'), pch = c(1,1,1), pt.cex = sc*c(10,100,400))
-## lines(xseq, ilogit(y.linear), col = 'black', lty = 1)
-## lines(xseq, ilogit(y.up), col = 'red', lty = 3)
-## lines(xseq, ilogit(y.down), col = 'red', lty = 3)
-## dev.off()
-
-
-
-## Seroprevalence across West Africa
+## -----Plot seroprevalence prediction across West Africa
 heat.cols <- viridis(120, begin = 0.1, end = 1, option = 'D')
 png(file = paste(fold.name,'/Lassa_Seroprevalence.png', sep = ''),
     height = 4, width = 6, units = 'in', res = 400)
@@ -294,7 +215,11 @@ plot(foc.shp.ogr, add = TRUE, bty = 'n', asp = 1)
 plot(rgeos::gIntersection(foc.shp.ogr, masto.rangemap), add = TRUE, bty = 'n', asp = 1, lwd = 3)
 dev.off()
 
+
+
 #########################
+
+
 
 ## Make plot of residuals
 human.test.dat$Resid <- with(human.test.dat, PropAb - fitted)
@@ -379,28 +304,31 @@ dev.off()
 pred.rast <- resample(pred.rast, pop.rast)
 LS.rast.proj <- resample(LS.rast, pop.rast, method = 'ngb')
 
-## Convert lifespan to country-specific death rate; calculate LASV case rate,
-## first without, then with, reinfection
+## Convert lifespan to country-specific death rate; calculate LASV case rate
+## without reinfection. In the mathematica notebook, we show that seroreversion
+## rate lam simply multiplies the case rate by a factor (d+lam)/d. We'll
+## incorporate this multiplying effect of seroreversion below. 
 drast <- 1/LS.rast.proj
 human.lasv.cases <- pred.rast*pop.rast*(drast + gam)*(drast) / (gam * (1-mu))
-##human.lasv.cases.wreinf <- pred.rast*pop.rast*(drast + gam)*(drast + ) / (gam * (1-mu))
 
-## Plot human.lasv.cases
-xlims = c(-18,16)
-ylims = c(16, 16.5)
-heat.cols <- viridis(120, begin = 0.1, end = 1, option = 'D')
-png(file = paste(fold.name,'/New_Cases.png', sep = ''),
-    height = 4, width = 6, units = 'in', res = 400)
-par(mai = 1*c(0.2,0.2,0.2,1))
+## Aggregate cases 
 agg.cases <- aggregate(human.lasv.cases, fact = 10, fun = sum)
 case.density = agg.cases/raster::area(agg.cases)
 case.density = mask(case.density, masto.rangemap, updatevalue = 0)
 
+## Plot human.lasv.cases
+xlims = c(-18,16)
+ylims = c(16, 16.5)
+heat.cols <- viridis(5, begin = 0.0, end = 1, option = 'D')
+png(file = paste(fold.name,'/New_Cases.png', sep = ''),
+    height = 4, width = 6, units = 'in', res = 400)
+par(mai = 1*c(0.2,0.2,0.2,1))
 ## Set arbitrary lower bound on case.density (so its not -Inf)
 ymin <- 1e-3
 case.density[case.density < ymin] <- ymin
 yaxlab = c(0,sapply(paste(-2:2), function(x){as.expression(bquote(10^ .(x)))}))
-image.plot(log10(case.density), col = heat.cols, zlim = c(-3, 2.5),
+image.plot(log10(case.density), col = heat.cols, breaks = c(-3,-2,-1,0,1,2),
+           zlim = c(-3, 2.5),
            bty = 'n', xlab = '', ylab = '', xaxt = 'n', yaxt = 'n',
            xlim = xlims, ylim = ylims,
            asp = 1, legend.lab = as.expression(bquote('Predicted Cases / ( Year x km'^2*' )')),
@@ -426,7 +354,10 @@ foc.countries <- c('Mali', "Guinea", "Ivory Coast", "Sierra Leone",
                    'Senegal')
 org.cases.dat <- get.country.sums(human.lasv.cases)
 
-## Calculate the effect of reinfection and virulence for each country
+## Calculate the effect of reinfection and virulence for each country. This is done by
+## calculating the multiplying effect of seroreversion on case estimates for each
+## country, given that country's average lifespan.
+
 lifespan.dat <- read.csv("../Storage/CSV_Data/foc_Lifespan.csv", stringsAsFactors = FALSE) 
 ## Add a dummy country "Total" for compatibility with org.cases.dat
 lifespan.dat <- rbind(lifespan.dat,
@@ -451,12 +382,13 @@ cases.dat$Rate <- round(1000*merged.cases.dat$Rate, 1)
 cases.dat$Cases.high <- round(merged.cases.dat$Cases.high/1000, 1)
 cases.dat$Rate.high <- round(1000*merged.cases.dat$Rate.high, 1)
 
-## Order 
+## Write case data and GLM output to file 
 write.table(cases.dat, file = paste(fold.name, '/foc_case', sep = ''))
 write.table(org.cases.dat, file = paste(fold.name, '/org_foc_case', sep = ''))
+capture.output(qbin.summ, file = paste(fold.name, '/glm_summary', sep = ''))
+
 
 ##fold.name <- 'Figures_Fits/human_v3'
-##cases.dat <- read.table(file = paste(fold.name, '/foc_case', sep = ''))
 print(Sys.time() - starttime)
 
 ## Simple dataframe with LASV case count totals
@@ -465,7 +397,3 @@ tot.round <- round(tot.model,1) ## Base estimates
 tot.high.round <- round(cases.dat[cases.dat$Country=='Total', 'Cases.high'], 1) ## with Reinfection
 output <- data.frame(type = 'model', low.est = tot.round, high.est = tot.high.round,
                      stringsAsFactors = FALSE)
-
-
-
-

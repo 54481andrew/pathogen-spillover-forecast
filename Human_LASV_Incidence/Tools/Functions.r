@@ -1,13 +1,4 @@
-
-## Calculates deviance-based pseudo r-squared
-## from Cameron, Windmeijer, 1996
-pseudor2.fun <- function(obj){
-    a = summary(obj)
-    1 - a$deviance/a$null.deviance
-}
-
-
-## Generate a folder name for tree with specified properties
+## Generate a folder name for pathogen fit
 generate.lassa.name <- function(gridgi){
     fold.name <- with(gridgi, paste('pa_nboots', nboots,
                                     'tc', tree.complexity,
@@ -16,6 +7,8 @@ generate.lassa.name <- function(gridgi){
                                     sep='_')) ## Folder suffix for data storage and results
     return(fold.name)
 }
+
+## Generate a folder name for reservoir fit
 generate.masto.name <- function(gridgi){
     fold.name <- with(gridgi, paste('pa_nboots',nboots,
                                     'tc', tree.complexity,
@@ -32,7 +25,7 @@ generate.masto.name <- function(gridgi){
 ## cases in each West African country.
 get.country.sums <- function(human.lasv.cases){
 
-    ## We only need a subset of africa.ogr
+    ## Subset africa.ogr to West African countries
     ss.africa.ogr <- africa.ogr[africa.ogr$COUNTRY %in% foc.countries,]
     
     ## Extract and sum human LASV cases within each region
@@ -79,32 +72,3 @@ get.country.sums <- function(human.lasv.cases){
     return(case.df.foc)
 }## End Function
 
-## ---
-## Log-likelihood
-LL = function(P,D, tol = 1e-8){
-  mask.notna = which(!is.na(P) & !is.na(D))
-  P = P[mask.notna]
-  P[P < tol] = tol
-  D = D[mask.notna]
-  ll = 0
-    for(i in 1:length(P)){
-    ll = ll + -P[i] + D[i]*log(P[i]) - sum(log(1:max(1,D[i])))
-      }
-  return(ll)
-  }
-
-## ---
-## Deviance
-Dev = function(P,D, tol = 1e-8){
-  mask.notna = which(!is.na(P) & !is.na(D))
-  P = P[mask.notna]
-  P[P < tol] = tol
-  D = D[mask.notna]
-  dev = 0
-    for(i in 1:length(P)){
-      devi = ifelse(D[i]==0, 2*P[i],  2*(D[i]*log(D[i]/P[i]) - (D[i]-P[i])))
-      dev = dev + devi
-  }
-  return(dev)
-  }
-## ---
