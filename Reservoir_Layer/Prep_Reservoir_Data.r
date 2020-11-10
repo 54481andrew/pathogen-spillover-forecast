@@ -38,6 +38,9 @@ Prep.Reservoir.Data <- function(Species){
     ## Add column indicating that these are Presence data
     classi.dat$Presence = 1
 
+    ## Add column indicating that these data are not directly from genbank
+    classi.dat$genbank = FALSE
+    
     ## -- Incorporate GenBank dataset into classi.dat
     
     ## Load GenBank data
@@ -59,9 +62,11 @@ Prep.Reservoir.Data <- function(Species){
     genbank.dat.form <- with(genbank.dat,
                              data.frame(Longitude = Long, Latitude = Lat,
                                         Country = Country,
+                                        Genus = 'Mastomys',
                                         Species = Species, Presence = 1,
                                         Year = gbCollectYear, min.Year = min.Year,
-                                        max.Year = max.Year))
+                                        max.Year = max.Year,
+                                        genbank = TRUE))
     classi.dat <- rbind.fill(classi.dat, genbank.dat.form)
     minimum.year = min(classi.dat$min.Year)
 
@@ -120,7 +125,8 @@ Prep.Reservoir.Data <- function(Species){
     
     background.dat <- background.dat[keep,]
     background.dat$Presence = 0
-
+    background.dat$genbank = FALSE
+    
     ## Join the Presence and Background data-sets together
     classi.dat <- rbind.fill(classi.dat, background.dat)
     
@@ -149,6 +155,26 @@ Prep.Reservoir.Data <- function(Species){
     wi.range <- which(!is.na(overMastobg$PRESENCE))
     classi.dat <- classi.dat[wi.range,]
 
+    ## Now store information on the amount of each type of data
+    mask.pres <- classi.dat$Presence==1
+    mask.gen <- classi.dat$genbank
+    background.dat <- classi.dat[!mask.pres,]
+    gen.dat <- classi.dat[mask.pres & mask.gen,]
+    lit.dat <- classi.dat[mask.pres & !mask.gen,]
+    info <- paste0('-- Count Statistics -- \n \n',
+                   'Before Purge: \n\n', 
+                   'Number Background: ', nrow(background.dat), '\n', 
+                   paste0('Collected Between: ', min(background.dat$min.Year),
+                          ' - ', max(background.dat$max.Year)), '\n', 
+                   paste0('----\n'),
+                   'Literature Presences: ', nrow(lit.dat), '\n',
+                   paste0('Collected Between: ', min(lit.dat$min.Year),
+                          ' - ', max(lit.dat$max.Year)), '\n',
+                   paste0('----\n'),
+                   'Genbank Presences: ', nrow(gen.dat), '\n',
+                   paste0('Collected Between: ', min(gen.dat$min.Year),
+                          ' - ', max(gen.dat$max.Year)), '\n')
+    
     ## Finally, only keep points that fall within unique pixels. This is
     ## achieved with the purge.repeats function. The pixelation of
     ## West Africa is determined by the 0.05x0.05 degree MODIS precipitation
@@ -190,9 +216,21 @@ Prep.Reservoir.Data <- function(Species){
     
     ## Print number of pixels classified as presences for each species
     print('-- Count Statistics --', quote = FALSE)
-    print(paste0('Number Background: ', sum(classi.dat$Presence==0)), quote = FALSE)
-    print(paste0('Number Presence: ', sum(classi.dat$Presence==1)), quote = FALSE)
-    print(paste0('Collected Between: ', min(classi.dat$min.Year), ' - ', max(classi.dat$max.Year)), quote = FALSE)
+    nback <- sum(classi.dat$Presence==0)
+    npres <- sum(classi.dat$Presence==1)
+    yrange <- paste0(min(classi.dat$min.Year), ' - ', max(classi.dat$max.Year))
+    print(paste0('Number Background: ', nback), quote = FALSE)
+    print(paste0('Number Presence: ', npres), quote = FALSE)
+    print(paste0('Collected Between: ', yrange), quote = FALSE)
+    
+    ## Write information on data preparation to file
+    info <- paste0(info, '\n\n', 'After Purge: \n\n', 
+                   'Number Background: ', nback, '\n', 
+                   'Number Presences: ', npres, '\n',
+                   'All Collected Between: ', yrange)
+    write(info, paste0('Figures_Fits/', prefix, '/',fold,'/','data_prep_info.txt'))
+
+
     
     ## Map figure showing pixel [Species] capture locations. Load shapefile for plotting.
     png(file = paste0('Figures_Fits/',prefix, '/',fold,'/', Species.name,'_captures.png'),
