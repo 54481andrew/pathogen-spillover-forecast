@@ -220,14 +220,15 @@ Prep.Pathogen.Data <- function(hypers.i){
     ## Store some of the printed output to file
     nneg <- sum(jrod.purged$ArenaStat==0)
     npos <- sum(jrod.purged$ArenaStat==1)
-    info <- paste0('Rodent: \n\n', 
+    info <- paste0('Rodent: \n', 
                    'Number Absences: ', nneg, '\n', 
-                   'Number Presences: ', npos, '\n',
-                   'Human: \n\n',
-                   'Number sites: ', nrow(human.test.dat))
+                   'Number Presences: ', npos, '\n\n',
+                   'Human: \n',
+                   'Number sites: ', nrow(human.test.dat), '\n',
+                   'Number studies: ', length(unique(human.test.dat$Source)), '\n',
+                   'Year range: ', hum.yrange)
     write(info, paste0('Figures_Fits/', prefix, '/',fold,'/','data_prep_info.txt'))
 
-    
     png(file = paste0('Figures_Fits/', prefix, '/',fold,'/',
                       'Human_Test_Dat.png'), width = 6, height = 4, units = 'in', res = 400)
     par(mai = 1*c(0.2,0.2,0.2,0.2))
