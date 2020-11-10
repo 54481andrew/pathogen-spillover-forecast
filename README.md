@@ -32,10 +32,13 @@ trees within the Reservoir Layer and Pathogen Layer directories,
 respectively. These fitted models are used to generate a combined risk
 of pathogen spillover into humans.  The second stage of the model is
 contained in the Human_LASV_Incidence directory, and uses a regression
-model to associate seroprevalence in human populations with the combined
-risk derived in the first stage. Lastly, a
-susceptible-infected-recovered model is used to convert the predicted
-seroprevalence into estimates of human LASV infections in West Africa.
+model to associate seroprevalence in human populations with the
+combined risk derived in the first stage. Hypothesis testing that is
+associated with this regression automatically provides a rigorous
+evaluation of the spillover risk's ability to predict human LASV
+seroprevalence.  Lastly, an SIRS model is used to convert the
+predicted seroprevalence into estimates of human LASV infections in
+West Africa.
 
 The results presented in the manuscript were created with R version
 3.6.0 (2019-04-26) "Planting of a Tree". Different versions of R
@@ -60,15 +63,15 @@ Predictors are included as a pre-processed raster stack
 (Storage/Raster_Data/all.stack). While we include the scripts that
 were used to process and compile the original raster data into
 stack-form, we do not include the original data itself because of
-memory considerations. If the user wishes to reproduce the
+storage considerations. If the user wishes to reproduce the
 calculations that produce the data stack, the original data-set must
 be re-downloaded from the sources referenced in the manuscript and
 placed in the Original_Data directories within the Storage directory.
 
-Predictors for the Reservoir layer, as well as the Pathogen layer, are
-chosen from the list of candidate predictors using a Wilcox significance
-test (described in the layers below). Candidate predictors are listed
-in the tables below.
+Predictors that are used in the Reservoir layer, as well as the
+Pathogen layer, are chosen from the list of candidate predictors using
+a Wilcox significance test (described in the layers below). Candidate
+predictors are listed in the tables below.
 
 |Name| Description                                                      | 
 |----|------------------------------------------------------------------|
@@ -162,6 +165,9 @@ train a set of 25 boosted classification trees
 Generate_Reservoir_Learners.r loops through sets of hyper-parameters
 that specify a boosted classification tree algorithm, and passes said
 hyper-parameters to the Train.Reservoir.Learners function for fitting.
+All information from the Generate script is stored in a
+sub-directory of Figures_Fits, [prefix], that is created when the
+code is run. 
 
 The three main functions that Generate_Reservoir_Learners.r calls are
 contained in the following scripts: 
