@@ -213,8 +213,20 @@ Prep.Pathogen.Data <- function(hypers.i){
     ## Time span
     temp <- with(human.test.dat, strsplit(paste(Year), '-'))
     years = sapply(temp, FUN = function(x){range(as.numeric(x))})
-    print(paste0('Human seroprevalence collected between ', paste(range(years), collapse = '-')),
+    hum.yrange <- paste(range(years), collapse = '-')
+    print(paste0('Human seroprevalence collected between ', hum.yrange),
           quote = FALSE)
+
+    ## Store some of the printed output to file
+    nneg <- sum(jrod.purged$ArenaStat==0)
+    npos <- sum(jrod.purged$ArenaStat==1)
+    info <- paste0('Rodent: \n\n', 
+                   'Number Absences: ', nneg, '\n', 
+                   'Number Presences: ', npos, '\n',
+                   'Human: \n\n',
+                   'Number sites: ', nrow(human.test.dat))
+    write(info, paste0('Figures_Fits/', prefix, '/',fold,'/','data_prep_info.txt'))
+
     
     png(file = paste0('Figures_Fits/', prefix, '/',fold,'/',
                       'Human_Test_Dat.png'), width = 6, height = 4, units = 'in', res = 400)

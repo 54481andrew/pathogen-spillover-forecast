@@ -74,10 +74,8 @@ cat(paste0('\n\n\n\n' , '---- ', prefix, ' ----', '\n\n\n\n'))
 starttime <- Sys.time()
 
 ## Create [prefix] directory
-dirpath <- paste('Figures_Fits')
-if(!dir.exists(dirpath)){dir.create(dirpath, showWarnings = FALSE)}
 dirpath <- paste('Figures_Fits/',prefix,sep='')
-if(!dir.exists(dirpath)){dir.create(dirpath, showWarnings = FALSE)}
+if(!dir.exists(dirpath)){dir.create(dirpath, showWarnings = FALSE, recursive = TRUE)}
 
 for(ii in 1:nrow(hypers.dat)){
 
