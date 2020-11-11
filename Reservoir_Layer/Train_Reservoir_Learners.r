@@ -38,10 +38,6 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
     learning.rate <- 10^-hypers.i[,'mllr']
     max.trees <- 10^hypers.i[,'lmt']
 
-    ## Print model name
-    cat(paste0('\n\n\n\n'))
-    print(paste('--------- Model fit name:', fold, '-------------'), quote = FALSE)
-
     ## Model fit statistics are stored here
     tree.filename = paste0('Figures_Fits/', prefix, '/',
                            fold, '/tree.dat')

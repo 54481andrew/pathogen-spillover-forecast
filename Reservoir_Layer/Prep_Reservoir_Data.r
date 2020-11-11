@@ -66,7 +66,8 @@ Prep.Reservoir.Data <- function(Species){
                                         Species = Species, Presence = 1,
                                         Year = gbCollectYear, min.Year = min.Year,
                                         max.Year = max.Year,
-                                        genbank = TRUE))
+                                        genbank = TRUE,
+                                        uID = UniqueID))
     classi.dat <- rbind.fill(classi.dat, genbank.dat.form)
     minimum.year = min(classi.dat$min.Year)
 
@@ -222,6 +223,10 @@ Prep.Reservoir.Data <- function(Species){
     print(paste0('Number Background: ', nback), quote = FALSE)
     print(paste0('Number Presence: ', npres), quote = FALSE)
     print(paste0('Collected Between: ', yrange), quote = FALSE)
+
+    ## Lines below can be used during debug to see which genbank points were used. Helps avoid duplicates. 
+    ## uids = classi.dat[!is.na(classi.dat$uID),'uID']    
+    ## genbank.dat[genbank.dat$UniqueID%in%uids, c('Reference', 'LocVillage', 'Lat', 'Long', 'min.Year')]
     
     ## Write information on data preparation to file
     info <- paste0(info, '\n\n', 'After Purge: \n\n', 
@@ -229,7 +234,6 @@ Prep.Reservoir.Data <- function(Species){
                    'Number Presences: ', npres, '\n',
                    'All Collected Between: ', yrange)
     write(info, paste0('Figures_Fits/', prefix, '/',fold,'/','data_prep_info.txt'))
-
 
     
     ## Map figure showing pixel [Species] capture locations. Load shapefile for plotting.
@@ -244,6 +248,9 @@ Prep.Reservoir.Data <- function(Species){
     legend(x = 'topleft', legend = c('Confirmed captures', 'Background'), pch = c(21,4),
            pt.bg = c('green',NA), col = 'black')
     dev.off()
-
+    
     return(classi.dat)
 } ## End function
+
+
+

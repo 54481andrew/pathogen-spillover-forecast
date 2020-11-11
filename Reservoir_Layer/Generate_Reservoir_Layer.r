@@ -90,6 +90,10 @@ for(ii in 1:nrow(hypers.dat)){
     }
     dir.create(models.folder,showWarnings = FALSE)
 
+    ## Print model name
+    cat(paste0('\n\n\n\n'))
+    print(paste('--------- Model fit name:', fold, '-------------'), quote = FALSE)
+    
     ## Prep in the presence/absence data for [Species]
     Species = paste(hypers.dat$Species[ii])
     classi.dat.rod <- Prep.Reservoir.Data(Species)

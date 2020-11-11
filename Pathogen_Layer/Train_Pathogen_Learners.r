@@ -23,10 +23,6 @@ train.pathogen.learners <- function(rodlsv.survey.dat, hypers.i = NULL){
     learning.rate <- 10^(-hypers.i[,'mllr']) ## Learning rate in the model
     max.trees <- 10^hypers.i[,'lmt'] ## Max number of trees in the model: 100000
 
-    ## Print model name
-    cat(paste0('\n\n\n\n'))
-    print(paste('--------- Model fit name:', fold, '-------------'), quote = FALSE)
-
     num.survey <- nrow(rodlsv.survey.dat)
 
     mcl.fun <- function(boot.i, verbose = FALSE){
