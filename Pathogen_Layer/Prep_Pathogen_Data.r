@@ -147,8 +147,8 @@ Prep.Pathogen.Data <- function(hypers.i){
     ambiguous.data <- merged.ambiguous.data[merged.ambiguous.data$NumPosVirus.y==0,]
 
     ## Determine which genbank entries give rise to presence pixels (for debugging)
-    ## uids <- jrod.purged[jrod.purged$genbank, 'uID']
-    ## unique(jrod.purged[!is.na(jrod.purged$uID), c('Village','Source')])
+    ##uids <- jrod.purged[jrod.purged$genbank, 'uID']
+    ##unique(jrod.purged[!is.na(jrod.purged$uID), c('Village','Source')])
     ## ## Leski et al. 2015 and Fichet-Calvet et al. 2016 
     
     ## -----------------
