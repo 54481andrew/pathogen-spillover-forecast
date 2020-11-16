@@ -64,6 +64,7 @@ Prep.Pathogen.Data <- function(hypers.i){
     genbank.dat$Species <- 'Mastomys natalensis'
     
     ## Reformat to be compatible with historical survey data
+    classi.dat$uID <- NA ## For compatibility with ID column of genbank data
     genbank.dat.form <- with(genbank.dat,
                              data.frame(Longitude = Long, Latitude = Lat,
                                         Country = Country, Village = LocVillage,
@@ -79,7 +80,8 @@ Prep.Pathogen.Data <- function(hypers.i){
                                         Year = gbCollectYear,
                                         Bibtex = NA,
                                         TotPos = 1, TotTest = 1,
-                                        genbank = TRUE
+                                        genbank = TRUE,
+                                        uID = UniqueID
                                         ))
     
     ## Add into classi.dat
@@ -144,6 +146,11 @@ Prep.Pathogen.Data <- function(hypers.i){
     ## Points with confirmed LASV virus from genbank are not ambiguous, so remove them
     ambiguous.data <- merged.ambiguous.data[merged.ambiguous.data$NumPosVirus.y==0,]
 
+    ## Determine which genbank entries give rise to presence pixels (for debugging)
+    ## uids <- jrod.purged[jrod.purged$genbank, 'uID']
+    ## unique(jrod.purged[!is.na(jrod.purged$uID), c('Village','Source')])
+    ## ## Leski et al. 2015 and Fichet-Calvet et al. 2016 
+    
     ## -----------------
     
     ## Define sites as positive or negative or NA for arenavirus (indicated in ArenaStat column).
@@ -163,7 +170,7 @@ Prep.Pathogen.Data <- function(hypers.i){
     jrod.purged[mask.ambi, 'ArenaStat'] <- hypers.i$set.ambiguous.to
 
     ## Save ambiguous pixels for debugging purposes
-    ambiguous.pixels <- jrod.purged[mask.ambi,c()]
+    ambiguous.pixels <- jrod.purged[mask.ambi,]
     
     ## Now that ambiguous entries have been set to what the user wants, exclude any entries
     ## from jrod.purged that still have NA ArenaStat

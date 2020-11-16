@@ -37,7 +37,7 @@ set.seed(1)
 ## pixels were handled. These were set to NA or 1; [set.ambiguous.to]
 ## allows the user to choose which pathogen layer fit is used for the human
 ## predictions. 
-set.ambiguous.to <- 1
+set.ambiguous.to <- NA
 grid.name <- paste0('human_v3_ambi',set.ambiguous.to) ## name for model.dat dataframe
 prefix.masto <- 'reservoir_v3' ## prefix used in Generate_Reservoir_Layer
 masto.fold <- 'Mn_pa_nboots_25_nbg_Same_tc_1_mllr_2_lmt_7'
@@ -133,30 +133,43 @@ bin.mod <- glm(PropAb~ 1 + Dx, human.test.dat,
               weights = NumTestAb)
 bin.summ <- summary(bin.mod)
 
-## Fit quasi-binomial model
+## Fit quasi-binomial model. Note that the parameter
+## estimates of the quasi-binomial are identical to
+## those of the standard binomial. 
 qb.mod <- glm(PropAb~ 1 + Dx, human.test.dat,
               family = 'quasibinomial',
               weights = NumTestAb)
 qbin.summ <- summary(qb.mod)
+
 
 ## --- Use regression model to predict human LASV seroprevalence across West Africa
 pred.stack <- stack(Dx)
 names(pred.stack) = 'Dx'
 pred.rast <- raster::predict(object = pred.stack, model = qb.mod, type = 'response')
 
-## --- Plot predicted seroprevalence vs actual seroprevalence, and also plot
-## predicted seroprevalence across West Africa
+
+## Add some useful columns in human.test.dat data frame
 human.test.dat$fitted <- extract(x = pred.rast,
                           y = human.test.dat[,c('Longitude', 'Latitude')])
+human.test.dat$res <- residuals(bin.mod, type = 'deviance')
+human.test.dat$y.linear <- with(human.test.dat,
+                                Dx*qb.mod$coefficients['Dx'] + qb.mod$coefficients['(Intercept)'])
 
-## Compute confidence intervals
 
-## Define some variables that are used in graphing
-xseq <- seq(0,1,by = 0.01)
-y.linear <- xseq*qb.mod$coefficients['Dx'] + qb.mod$coefficients['(Intercept)']
-ilogit <- function(x){exp(x)/(1 + exp(x))} ## inverse logit will come in handy
+## ---Make a plot of the deviance residuals
+png(filename = paste(fold.name,'/Deviance_Residuals.png',sep=''),
+    width = 4, height = 4, units = 'in', res = 400)
+par(mar = c(3.25,3.25,0.5,0.5))
+plot(res~fitted, data = human.test.dat,
+     xlab = '', ylab = '',
+     main = '')
+mtext(side = 1, text = 'Fitted Value', line = 2.4)
+mtext(side = 2, text = 'Deviance Residual', line = 2.4)
+dev.off()
 
-## Bootstrap confidence intervals
+## ---Plot prediction vs Dx with confidence intervals.
+## First compute CI using a bootstrap method.
+
 f <- function(seed){
     ## Set seed for reproducibility
     set.seed(seed) 
@@ -182,6 +195,12 @@ conf.out <- sapply(X = 1:nrow(boot.out),
                    FUN = function(x){as.numeric(quantile(boot.out[x,],
                                                          probs = c((1-xconf)/2, 1-(1-xconf)/2)
                                                          ))})
+
+## Define some variables that are used in graphing
+xseq <- seq(0,1,by = 0.01)
+y.linear.xseq <- xseq*qb.mod$coefficients['Dx'] + qb.mod$coefficients['(Intercept)']
+ilogit <- function(x){exp(x)/(1 + exp(x))} ## inverse logit will come in handy
+
 conf.out <- t(conf.out)
 sc = 0.01 ## Scaling of points
 png(filename = paste(fold.name,'/Pred_vs_Fit.png',sep=''),
@@ -193,7 +212,7 @@ plot(PropAb~Dx, data = human.test.dat, cex = sc*NumTestAb,
 mtext(side = 1, text = as.expression(bquote('D'['x']~'Layer')), line = 2.4)
 mtext(side = 2, text = 'Seroprevalence', line = 2.4)
 legend(x = 'topleft', legend = c('10', '100', '400'), pch = c(1,1,1), pt.cex = sc*c(10,100,400))
-lines(xseq, ilogit(y.linear), col = 'black', lty = 1)
+lines(xseq, ilogit(y.linear.xseq), col = 'black', lty = 1)
 matlines(xseq, conf.out, col = 'red', lty = 2)
 dev.off()
 
