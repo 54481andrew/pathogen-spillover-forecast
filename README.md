@@ -41,7 +41,7 @@ predicted seroprevalence into estimates of human LASV infections in
 West Africa.
 
 The results presented in the manuscript were created with R version
-3.6.0 (2019-04-26) "Planting of a Tree". Different versions of R
+4.0.0 (2020-04-24) "Arbor Day". Different versions of R
 will give slightly different results because of differences in the random
 number generator that is used. Running the model code requires
 installing the following packages:

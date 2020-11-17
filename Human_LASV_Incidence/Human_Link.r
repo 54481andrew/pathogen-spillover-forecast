@@ -196,7 +196,7 @@ conf.out <- sapply(X = 1:nrow(boot.out),
                                                          probs = c((1-xconf)/2, 1-(1-xconf)/2)
                                                          ))})
 
-## Define some variables that are used in graphing
+## Define some variables/functions that are used in graphing
 xseq <- seq(0,1,by = 0.01)
 y.linear.xseq <- xseq*qb.mod$coefficients['Dx'] + qb.mod$coefficients['(Intercept)']
 ilogit <- function(x){exp(x)/(1 + exp(x))} ## inverse logit will come in handy
@@ -235,9 +235,7 @@ plot(rgeos::gIntersection(foc.shp.ogr, masto.rangemap), add = TRUE, bty = 'n', a
 dev.off()
 
 
-
 #########################
-
 
 
 ## Make plot of residuals
@@ -362,7 +360,6 @@ write.table(org.cases.dat, file = paste(fold.name, '/org_foc_case', sep = ''))
 capture.output(qbin.summ, file = paste(fold.name, '/glm_summary', sep = ''))
 
 
-##fold.name <- 'Figures_Fits/human_v3'
 print(Sys.time() - starttime)
 
 ## Simple dataframe with LASV case count totals
