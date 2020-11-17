@@ -269,51 +269,6 @@ plot(foc.shp.ogr, main = '', add = TRUE, bty = 'n', asp = 1)
 plot(rgeos::gIntersection(foc.shp.ogr, masto.rangemap), add = TRUE, bty = 'n', asp = 1, lwd = 3)
 dev.off()
 
-
-## 2nd Plot has continuous color scheme
-n.cols <- 100
-pt.cols <- colorRampPalette(c('darkblue', 'white', 'red'), bias=1)(n.cols)
-seq.vals <- seq(-0.4, 0.4, length.out = 100)
-col.fun <- function(x){
-    cols <- c()
-    for(xi in 1:length(x)){
-        wi <- which.min(abs(x[xi] - seq.vals))
-        cols <- c(cols, pt.cols[wi])
-    }
-    return(cols)
-}
-cex.fun <- function(x){
-        cex.vals <- c()
-        for(xi in 1:length(x)){
-            cex.vals <- c(cex.vals, min(x[xi]/100, 1))
-        }
-        return(cex.vals)
-}
-
-png(file = paste(fold.name,'/resid_v2.png', sep=''), width = 6,
-     height = 5, units = 'in', res = 400)
-par(mai = 1*c(0.0,0.2,0.0,0.6))
-image.plot(pred.rast, col = heat.cols, zlim = c(0, zmax),
-           bty = 'n', xlab = '', ylab = '', xaxt = 'n', yaxt = 'n',
-           main = '', xlim = xlims, ylim = ylims,
-           asp = 1, legend.lab = 'Predicted Seroprevalence',
-           legend.line = 2.75)
-image.plot(col = pt.cols,legend.only = TRUE, horizontal = TRUE,
-           zlim = c(-0.4, 0.4), smallplot = c(0.1, 0.8, 0.93, 0.95),
-           legend.lab = 'Actual - Predicted Seroprevalence',
-           legend.line = -1.7, bg = 'white')
-cexvals <- cex.fun(human.test.dat$NumTestAb)
-points(Latitude~Longitude, data = human.test.dat, asp = 1, pch = 21, lwd = 0.8,
-       bg = col.fun(Resid),
-       col = 'black', cex = cexvals)
-plot(foc.shp.ogr, main = '', add = TRUE, bty = 'n', asp = 1)
-plot(rgeos::gIntersection(foc.shp.ogr, masto.rangemap), add = TRUE, bty = 'n', asp = 1, lwd = 3)
-legend(x = -15, y = 3.5, legend = c('10', '100', '1000'),
-       pch = 19, pt.cex = cex.fun(c(10,100,1000)),
-       pt.bg = 'gray', horiz = TRUE, bty = 'n',
-       title = 'Number Tested')
-dev.off()
-
 #########################
 
 ## --- Use predicted human seroprevalence raster (pred.rast) to predict the
