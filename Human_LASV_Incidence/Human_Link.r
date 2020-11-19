@@ -101,7 +101,7 @@ wmean <- sum(human.test.dat$NumPosAb)/sum(human.test.dat$NumTestAb)
 
 ## --- Create location in which images will be saved
 fold.name <- paste('Figures_Fits/', grid.name, sep = '')
-dir.create(fold.name, showWarnings = FALSE)
+dir.create(fold.name, showWarnings = FALSE, recursive = TRUE)
 
 
 ## Plot product, D_X = D_L \times D_M, that describes the combined risk of LASV
