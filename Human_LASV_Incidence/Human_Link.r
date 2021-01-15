@@ -37,7 +37,7 @@ set.seed(1)
 ## pixels were handled. These were set to NA or 1; [set.ambiguous.to]
 ## allows the user to choose which pathogen layer fit is used for the human
 ## predictions. 
-set.ambiguous.to <- 1
+set.ambiguous.to <- NA
 min.test <- 10
 grid.name <- paste0('human_v4_ambi',set.ambiguous.to, '_mint_', min.test) ## name for model.dat dataframe
 prefix.masto <- 'reservoir_v3' ## prefix used in Generate_Reservoir_Layer
@@ -210,7 +210,7 @@ par(mar = c(3.25,3.25,0.5,0.5))
 plot(PropAb~Dx, data = human.test.dat, cex = sc*NumTestAb,
      xlab = '', ylab = '',
      main = '', ylim = c(0,0.6), xlim = c(0,0.85))
-mtext(side = 1, text = as.expression(bquote('D'['x']~'Layer')), line = 2.4)
+mtext(side = 1, text = as.expression(bquote('Predicted Risk of Lassa ( D'['x']~')')), line = 2.4)
 mtext(side = 2, text = 'Seroprevalence', line = 2.4)
 legend(x = 'topleft', legend = c('10', '100', '400'), pch = c(1,1,1), pt.cex = sc*c(10,100,400))
 lines(xseq, ilogit(y.linear.xseq), col = 'black', lty = 1)

@@ -1,9 +1,9 @@
 "Longitude","Latitude","Country","Village","Species","NumPosVirus","NumTestVirus","PropVirus","Virus_Diagnostic_Method","NumPosAb","NumTestAb","PropAb","Ab_Diagnostic_Method","Antibody_Target","Source","Human_Random_Survey","Year","Bibtex","TotPos","TotTest","genbank","uID","Cell","ArenaStat"
--9.01,11.51166667,"Guinea","Saourou","Mastomys natalensis",0,33,NA,NA,1,33,0.0303030303030303,"IFA","IgG","Fichet-Calvet_Becker-Ziaja_2014",FALSE,"2002-2004","fichet2014lassa",0,66,FALSE,NA,211536,1
+-9.01,11.51166667,"Guinea","Saourou","Mastomys natalensis",0,33,0,"PCR",1,33,0.0303030303030303,"IFA","IgG","Lecompte_Fichet-Calvet_2006; Fichet-Calvet_Becker-Ziaja_2014",FALSE,"2004","lecompte2006mastomys",0,33,FALSE,NA,211536,1
 -4.8925,6.128333333,"Ivory Coast","Ahouakro","Mastomys natalensis",0,221,0,"PCR",1,221,0.00452488687782805,"IFA","IgG","Coulibaly-NGolo_Allali_2011",FALSE,"2003-2005","coulibaly2011novel",0,221,FALSE,NA,284087,1
 -6.07,6.184166667,"Ivory Coast","Menekre","Mastomys natalensis",0,104,0,"PCR",2,104,0.0192307692307692,"IFA","IgG","Coulibaly-NGolo_Allali_2011",FALSE,"2003-2005","coulibaly2011novel",0,104,FALSE,NA,283392,1
 -2.610277778,8.171388889,"Ivory Coast","Sanguiebo","Mastomys natalensis",0,128,0,"PCR",2,128,0.015625,"IFA","IgG","Coulibaly-NGolo_Allali_2011",FALSE,"2003-2005","coulibaly2011novel",0,128,FALSE,NA,256621,1
 -7.248055556,10.52388889,"Mali","Minzaga","Mastomys natalensis",0,40,0,"PCR",1,40,0,"ELISA","IgG","Safronetz_Sogoba_2013",FALSE,"2012","safronetz2013geographic",0,40,FALSE,NA,224992,1
-4.513111111,7.543888889,"Nigeria","Abagboro","Mastomys natalensis",0,99,0,"PCR",1,99,0.0101010101010101,"IFA","IgG","Olayemi_Oyeyiola_2018",FALSE,"2011-2013","olayemi2018small",0,99,FALSE,NA,265487,1
-10.92088889,8.824222222,"Nigeria","Mayo Ranewo","Mastomys natalensis",0,31,0,"PCR",16,31,0.516129032258065,"IFA","IgG","Olayemi_Oyeyiola_2018",FALSE,"2011-2013","olayemi2018small",0,31,FALSE,NA,248169,1
-11.08552778,7.091888889,"Nigeria","Ngel Nyaki","Mastomys natalensis",0,24,0,"PCR",5,24,0.208333333333333,"IFA","IgG","Olayemi_Oyeyiola_2018",FALSE,"2011-2013","olayemi2018small",0,24,FALSE,NA,271657,1
+4.513111111,7.543888889,"Nigeria","Abagboro","Mastomys natalensis",0,99,0,"PCR",1,99,0.0101010101010101,"IFA","IgG","Olayemi_Oyeyiola_2018",FALSE,"2011-2012","olayemi2018small",0,99,FALSE,NA,265487,1
+10.92088889,8.824222222,"Nigeria","Mayo Ranewo","Mastomys natalensis",0,31,0,"PCR",16,31,0.516129032258065,"IFA","IgG","Olayemi_Oyeyiola_2018",FALSE,"2013","olayemi2018small",0,31,FALSE,NA,248169,1
+11.08552778,7.091888889,"Nigeria","Ngel Nyaki","Mastomys natalensis",0,24,0,"PCR",5,24,0.208333333333333,"IFA","IgG","Olayemi_Oyeyiola_2018",FALSE,"2013","olayemi2018small",0,24,FALSE,NA,271657,1
