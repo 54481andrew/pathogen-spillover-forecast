@@ -1,16 +1,20 @@
 ## Add columns describing total individuals tested, total
 ## number of individuals that were positive, and
 ## general positive / absence of LASV.
-add.total.columns <- function(dat, min.test = 5){
+add.total.columns <- function(dat){
     ## Update NA values in counts to 0
     dat$NumPosVirus <- with(dat, ifelse(is.na(NumPosVirus), 0, NumPosVirus))
     dat$NumTestVirus <- with(dat, ifelse(is.na(NumTestVirus), 0, NumTestVirus))
     dat$NumPosAb <- with(dat, ifelse(is.na(NumPosAb), 0, NumPosAb))
     dat$NumTestAb <- with(dat, ifelse(is.na(NumTestAb), 0, NumTestAb))
 
-    ## Compute total tested, total positive 
+    ## Compute total tested, total positive. Note that total test results
+    ## from same rows are assumed to be of the same rodents, so
+    ## TotTest = max(NumTestVirus, NumTestAb). This is important if
+    ## the number of rodents tested is fewer than 5, as it can double
+    ## count test results. 
     dat$TotPos <- with(dat, NumPosVirus)
-    dat$TotTest <- with(dat, NumTestVirus + NumTestAb)
+    dat$TotTest <- with(dat, apply(cbind(NumTestVirus, NumTestAb), MARGIN = 1, FUN = max))
 
     return(dat)
 }
@@ -122,9 +126,11 @@ purge.repeats <- function(dat, template){
             dat.with.repeats.removed$NumPosVirus[ldat] <- sum(dat[repeat.set, 'NumPosVirus'],
                                                               na.rm = TRUE)
             ## Update/aggregate other columns
-            dat.with.repeats.removed$TotTest[ldat] <- dat.with.repeats.removed$NumTestVirus[ldat] +
-                dat.with.repeats.removed$NumTestAb[ldat]
-            dat.with.repeats.removed$TotPos[ldat] <- sum(dat[repeat.set, 'NumPosVirus'], na.rm = TRUE)
+            dat.with.repeats.removed$TotTest[ldat] <- sum(dat[repeat.set,'TotTest'],
+                                                          na.rm = TRUE)
+            ## dat.with.repeats.removed$TotTest[ldat] <- dat.with.repeats.removed$NumTestVirus[ldat] +
+            ##     dat.with.repeats.removed$NumTestAb[ldat]
+            dat.with.repeats.removed$TotPos[ldat] <- dat.with.repeats.removed$NumPosVirus[ldat]
             ## Record cell number
             dat.with.repeats.removed$Cell[ldat] <- cells[keep.repeat]
         } ## End if checking for repeats

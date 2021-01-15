@@ -259,12 +259,12 @@ image.plot(pred.rast, col = heat.cols, zlim = c(zmin, zmax),
            legend.lab = 'Predicted Seroprevalence',
            legend.line = 2.75)
 cexvals <- cex.int + cex.sc*abs(human.test.dat$Resid)
-points(Latitude~Longitude, data = human.test.dat[human.test.dat$NumTestAb >= 50,],
+plot(rgeos::gIntersection(foc.shp.ogr, masto.rangemap), add = TRUE, bty = 'n', asp = 1, lwd = 3)
+points(Latitude~Longitude, data = human.test.dat,
        asp = 1, pch = 21, lwd = 0.8,
        bg = c('deepskyblue1', 'white', 'red')[ResidSign + 2],
        col = 'black', cex = 0.75)##cexvals)
 plot(foc.shp.ogr, main = '', add = TRUE, bty = 'n', asp = 1)
-plot(rgeos::gIntersection(foc.shp.ogr, masto.rangemap), add = TRUE, bty = 'n', asp = 1, lwd = 3)
 dev.off()
 
 #########################

@@ -45,7 +45,7 @@ Prep.Pathogen.Data <- function(hypers.i){
     
     ## Add columns describing total individuals tested (TotTest), and total
     ## number of individuals that were arenavirus positive (TotPos).
-    classi.dat = add.total.columns(classi.dat, hypers.i$min.test)
+    classi.dat = add.total.columns(classi.dat)
 
     ## Specify that these data are not from genbank
     classi.dat$genbank <- FALSE
