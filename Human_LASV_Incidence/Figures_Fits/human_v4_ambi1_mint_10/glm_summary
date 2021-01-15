@@ -1,0 +1,24 @@
+
+Call:
+glm(formula = PropAb ~ 1 + Dx, family = "quasibinomial", data = human.test.dat, 
+    weights = NumTestAb)
+
+Deviance Residuals: 
+   Min      1Q  Median      3Q     Max  
+-9.158  -3.176  -1.499   2.294   9.305  
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  -1.9838     0.1770 -11.207  < 2e-16 ***
+Dx            1.5513     0.4298   3.609 0.000499 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for quasibinomial family taken to be 15.37978)
+
+    Null deviance: 1613.8  on 93  degrees of freedom
+Residual deviance: 1405.4  on 92  degrees of freedom
+AIC: NA
+
+Number of Fisher Scoring iterations: 5
+

@@ -1,0 +1,8 @@
+Rodent: 
+Number Absences: 28
+Number Presences: 35
+
+Human: 
+Number sites: 94
+Number studies: 7
+Year range: 1970-2015
