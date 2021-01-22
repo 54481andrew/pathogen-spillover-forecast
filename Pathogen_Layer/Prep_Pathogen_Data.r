@@ -38,8 +38,8 @@ Prep.Pathogen.Data <- function(hypers.i){
                             'Ab_Diagnostic_Method', 'Antibody_Target',
                             'Source',
                             'Human_Random_Survey',
-                            'Year', 'Bibtex')]
-                            
+                            'Year', 'Bibtex', 'Survey_Dates',
+                            'Survey_Date_Notes')]                            
     keep <- !(is.na(full.dat$Latitude) | is.na(full.dat$Longitude))
     classi.dat <- full.dat[keep,]
     
@@ -79,6 +79,8 @@ Prep.Pathogen.Data <- function(hypers.i){
                                         Human_Random_Survey= FALSE,
                                         Year = gbCollectYear,
                                         Bibtex = NA,
+                                        Survey_Dates = NA,
+                                        Survey_Date_Notes = NA,
                                         TotPos = 1, TotTest = 1,
                                         genbank = TRUE,
                                         uID = UniqueID
@@ -171,6 +173,14 @@ Prep.Pathogen.Data <- function(hypers.i){
 
     ## Save ambiguous pixels for debugging purposes
     ambiguous.pixels <- jrod.purged[mask.ambi,]
+
+    ## Save absence data for debugging purposes
+    jrod.absences <- subset(jrod.purged, subset = ArenaStat==0,
+                            select = c('Source', 'Country', 'NumTestAb', 'Ab_Diagnostic_Method',
+                                       'NumTestVirus', 'Virus_Diagnostic_Method','TotTest',
+                                       'Survey_Dates',
+                                       'Survey_Date_Notes', 'Bibtex'))
+
     
     ## Now that ambiguous entries have been set to what the user wants, exclude any entries
     ## from jrod.purged that still have NA ArenaStat
@@ -196,6 +206,9 @@ Prep.Pathogen.Data <- function(hypers.i){
     ## Save a copy of rodent presence/absence dataset, as well as the human seroprevalence data
     write.csv(jrod.purged, file = paste0('Figures_Fits/', prefix, '/',fold,'/',
                                          'Prepped_Pathogen_PresAbs_Data.csv'),
+              row.names = FALSE)
+    write.csv(jrod.absences, file = paste0('Figures_Fits/', prefix, '/',fold,'/',
+                                         'Prepped_Pathogen_Rodent_Absence_Data.csv'),
               row.names = FALSE)
     write.csv(ambiguous.data, file = paste0('Figures_Fits/', prefix, '/',fold,'/',
                                             'Prepped_Pathogen_Ambiguous_Data.csv'),
