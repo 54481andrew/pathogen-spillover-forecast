@@ -37,10 +37,10 @@ set.seed(1)
 ## pixels were handled. These were set to NA or 1; [set.ambiguous.to]
 ## allows the user to choose which pathogen layer fit is used for the human
 ## predictions. 
-set.ambiguous.to <- NA
+set.ambiguous.to <- 1
 min.test <- 10
 grid.name <- paste0('human_v4_ambi',set.ambiguous.to, '_mint_', min.test) ## name for model.dat dataframe
-prefix.masto <- 'reservoir_v3' ## prefix used in Generate_Reservoir_Layer
+prefix.masto <- 'reservoir_v4' ## prefix used in Generate_Reservoir_Layer
 masto.fold <- 'Mn_pa_nboots_25_nbg_Same_tc_1_mllr_2_lmt_7'
 
 prefix.lassa <-  'pathogen_v4' ## prefix used in Generate_Lassa_Layer

@@ -24,7 +24,7 @@ require(verification)
 require(viridis)
 
 ## Directory name that will contain output for all hyperparameter sets
-prefix <- 'reservoir_v3'
+prefix <- 'reservoir_v4'
 
 ## Set version of random number generator to use to ensure
 ## reproducibility across R versions
