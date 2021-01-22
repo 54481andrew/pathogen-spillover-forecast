@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     21656,        620]
-NotebookOptionsPosition[     16500,        525]
-NotebookOutlinePosition[     17045,        546]
-CellTagsIndexPosition[     17002,        543]
+NotebookDataLength[     40108,       1119]
+NotebookOptionsPosition[     32062,        977]
+NotebookOutlinePosition[     32606,        998]
+CellTagsIndexPosition[     32563,        995]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -521,10 +521,462 @@ Including reinfection multiplies the case estimates by a factor of 420%; \
 including virulence increases estimates by 2%. \
 \>", "Text",ExpressionUUID->"ac93e7b2-fb5a-4397-b90a-b99444692a5a"]
 }, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Human LASV cases with undetectable antibody immune class", "Title",ExpressionUUID->"70d54b41-9157-4034-8dda-354502677e36"],
+
+Cell["\<\
+At the request of a reviewer, we also investigate the possibility that a \
+fraction, a, of recovered individuals with immunity (R) transition into a \
+class with undetectable immunity (C). This might be the case, for example, if \
+immunity were caused primarily by a T-cell response. into humans. \
+\>", "Text",ExpressionUUID->"f61fcaa1-5aeb-4072-92f3-3933facd34e0"],
+
+Cell[CellGroupData[{
+
+Cell["Define model", "Subchapter",ExpressionUUID->"8359d092-f296-4924-ac2f-44bd0a82138b"],
+
+Cell["\<\
+Define the system of ODEs that describe human infection.  Note the additional \
+class, c, and the rate term a. \
+\>", "Text",ExpressionUUID->"1464e4fa-61bf-4515-bac7-771e53276444"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"dsdt", " ", "=", " ", 
+   RowBox[{"b", " ", "-", " ", 
+    RowBox[{"d", " ", "s"}], " ", "-", " ", 
+    RowBox[{"F", " ", "s"}], " ", "+", " ", 
+    RowBox[{"\[Lambda]", " ", 
+     RowBox[{"(", 
+      RowBox[{"1", " ", "-", " ", "a"}], ")"}], " ", "r"}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"didt", " ", "=", " ", 
+   RowBox[{
+    RowBox[{"F", " ", "s"}], " ", "-", " ", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{"d", " ", "+", " ", "\[Gamma]"}], ")"}], " ", "i"}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"drdt", " ", "=", " ", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{"1", "-", "\[Mu]"}], ")"}], " ", "\[Gamma]", " ", "i"}], " ", 
+    "-", " ", 
+    RowBox[{"d", " ", "r"}], " ", "-", " ", 
+    RowBox[{"\[Lambda]", " ", "r"}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"dcdt", " ", "=", " ", 
+   RowBox[{
+    RowBox[{"a", " ", "lam", " ", "r"}], " ", "-", " ", 
+    RowBox[{"d", " ", "c"}]}]}], ";"}]}], "Input",ExpressionUUID->"fea2a55c-\
+c95f-456e-912f-23b6c94378d4"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[TextData[{
+ "Derive relationship between ",
+ StyleBox["seroprevalence",
+  IgnoreSpellCheck->True],
+ " and new case rate"
+}], "Subchapter",ExpressionUUID->"6db9f21f-ddc9-4383-8ef3-524f635138a8"],
+
+Cell["\<\
+The remainder of this analysis is identical to what was performed above. Note \
+that the equilibrium values of s are smaller when a > 0. Find the \
+equilibrium. \
+\>", "Text",ExpressionUUID->"961d8c79-dedd-4235-a68f-01c9da908a93"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"eq", " ", "=", " ", 
+  RowBox[{"FullSimplify", "[", 
+   RowBox[{"Solve", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"dsdt", "\[Equal]", "0"}], ",", " ", 
+       RowBox[{"didt", "\[Equal]", "0"}], ",", " ", 
+       RowBox[{"drdt", "\[Equal]", "0"}], ",", " ", 
+       RowBox[{"dcdt", " ", "\[Equal]", "0"}]}], "}"}], ",", " ", 
+     RowBox[{"{", 
+      RowBox[{"s", ",", "i", ",", "r", ",", "c"}], "}"}]}], "]"}], 
+   "]"}]}]], "Input",ExpressionUUID->"42b7d06d-239d-4e1b-a0c8-aa2694a07212"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{"s", "\[Rule]", 
+     FractionBox[
+      RowBox[{"b", " ", 
+       RowBox[{"(", 
+        RowBox[{"d", "+", "\[Gamma]"}], ")"}], " ", 
+       RowBox[{"(", 
+        RowBox[{"d", "+", "\[Lambda]"}], ")"}]}], 
+      RowBox[{
+       SuperscriptBox["d", "3"], "+", 
+       RowBox[{"d", " ", "F", " ", "\[Gamma]"}], "+", 
+       RowBox[{"d", " ", 
+        RowBox[{"(", 
+         RowBox[{"F", "+", "\[Gamma]"}], ")"}], " ", "\[Lambda]"}], "+", 
+       RowBox[{
+        SuperscriptBox["d", "2"], " ", 
+        RowBox[{"(", 
+         RowBox[{"F", "+", "\[Gamma]", "+", "\[Lambda]"}], ")"}]}], "+", 
+       RowBox[{"F", " ", "\[Gamma]", " ", "\[Lambda]", " ", 
+        RowBox[{"(", 
+         RowBox[{"a", "+", "\[Mu]", "-", 
+          RowBox[{"a", " ", "\[Mu]"}]}], ")"}]}]}]]}], ",", 
+    RowBox[{"i", "\[Rule]", 
+     FractionBox[
+      RowBox[{"b", " ", "F", " ", 
+       RowBox[{"(", 
+        RowBox[{"d", "+", "\[Lambda]"}], ")"}]}], 
+      RowBox[{
+       SuperscriptBox["d", "3"], "+", 
+       RowBox[{"d", " ", "F", " ", "\[Gamma]"}], "+", 
+       RowBox[{"d", " ", 
+        RowBox[{"(", 
+         RowBox[{"F", "+", "\[Gamma]"}], ")"}], " ", "\[Lambda]"}], "+", 
+       RowBox[{
+        SuperscriptBox["d", "2"], " ", 
+        RowBox[{"(", 
+         RowBox[{"F", "+", "\[Gamma]", "+", "\[Lambda]"}], ")"}]}], "+", 
+       RowBox[{"F", " ", "\[Gamma]", " ", "\[Lambda]", " ", 
+        RowBox[{"(", 
+         RowBox[{"a", "+", "\[Mu]", "-", 
+          RowBox[{"a", " ", "\[Mu]"}]}], ")"}]}]}]]}], ",", 
+    RowBox[{"r", "\[Rule]", 
+     RowBox[{"-", 
+      FractionBox[
+       RowBox[{"b", " ", "F", " ", "\[Gamma]", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "1"}], "+", "\[Mu]"}], ")"}]}], 
+       RowBox[{
+        SuperscriptBox["d", "3"], "+", 
+        RowBox[{"d", " ", "F", " ", "\[Gamma]"}], "+", 
+        RowBox[{"d", " ", 
+         RowBox[{"(", 
+          RowBox[{"F", "+", "\[Gamma]"}], ")"}], " ", "\[Lambda]"}], "+", 
+        RowBox[{
+         SuperscriptBox["d", "2"], " ", 
+         RowBox[{"(", 
+          RowBox[{"F", "+", "\[Gamma]", "+", "\[Lambda]"}], ")"}]}], "+", 
+        RowBox[{"F", " ", "\[Gamma]", " ", "\[Lambda]", " ", 
+         RowBox[{"(", 
+          RowBox[{"a", "+", "\[Mu]", "-", 
+           RowBox[{"a", " ", "\[Mu]"}]}], ")"}]}]}]]}]}], ",", 
+    RowBox[{"c", "\[Rule]", 
+     RowBox[{"-", 
+      FractionBox[
+       RowBox[{"a", " ", "b", " ", "F", " ", "lam", " ", "\[Gamma]", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "1"}], "+", "\[Mu]"}], ")"}]}], 
+       RowBox[{"d", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          SuperscriptBox["d", "3"], "+", 
+          RowBox[{"d", " ", "F", " ", "\[Gamma]"}], "+", 
+          RowBox[{"d", " ", 
+           RowBox[{"(", 
+            RowBox[{"F", "+", "\[Gamma]"}], ")"}], " ", "\[Lambda]"}], "+", 
+          RowBox[{
+           SuperscriptBox["d", "2"], " ", 
+           RowBox[{"(", 
+            RowBox[{"F", "+", "\[Gamma]", "+", "\[Lambda]"}], ")"}]}], "+", 
+          RowBox[{"F", " ", "\[Gamma]", " ", "\[Lambda]", " ", 
+           RowBox[{"(", 
+            RowBox[{"a", "+", "\[Mu]", "-", 
+             RowBox[{"a", " ", "\[Mu]"}]}], ")"}]}]}], ")"}]}]]}]}]}], "}"}], 
+  "}"}]], "Output",ExpressionUUID->"3c641703-d4fb-4a31-9be6-dabcf6967730"]
+}, Open  ]],
+
+Cell["\<\
+Find seroprevalence at equilibrium (this is the data we have to work with). \
+Note that this requires calculating the steady state population size in the \
+presence of LASV virulence. \
+\>", "Text",ExpressionUUID->"9482acc8-dd24-4bc6-a542-e4099cd9ddd7"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Pop", " ", "=", " ", 
+  RowBox[{"FullSimplify", "[", 
+   RowBox[{
+    RowBox[{"(", 
+     RowBox[{
+     "s", " ", "+", " ", "i", " ", "+", " ", "r", " ", "+", " ", "c"}], " ", 
+     ")"}], "/.", "eq"}], "]"}]}]], "Input",ExpressionUUID->"03e0ed29-5af3-\
+49f1-ba5f-60d71cd49e16"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  FractionBox[
+   RowBox[{"b", " ", 
+    RowBox[{"(", 
+     RowBox[{
+      SuperscriptBox["d", "3"], "+", 
+      RowBox[{"d", " ", "\[Gamma]", " ", "\[Lambda]"}], "+", 
+      RowBox[{
+       SuperscriptBox["d", "2"], " ", 
+       RowBox[{"(", 
+        RowBox[{"F", "+", "\[Gamma]", "+", "\[Lambda]"}], ")"}]}], "-", 
+      RowBox[{"a", " ", "F", " ", "lam", " ", "\[Gamma]", " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"-", "1"}], "+", "\[Mu]"}], ")"}]}], "+", 
+      RowBox[{"d", " ", "F", " ", 
+       RowBox[{"(", 
+        RowBox[{"\[Gamma]", "+", "\[Lambda]", "-", 
+         RowBox[{"\[Gamma]", " ", "\[Mu]"}]}], ")"}]}]}], ")"}]}], 
+   RowBox[{"d", " ", 
+    RowBox[{"(", 
+     RowBox[{
+      SuperscriptBox["d", "3"], "+", 
+      RowBox[{"d", " ", "F", " ", "\[Gamma]"}], "+", 
+      RowBox[{"d", " ", 
+       RowBox[{"(", 
+        RowBox[{"F", "+", "\[Gamma]"}], ")"}], " ", "\[Lambda]"}], "+", 
+      RowBox[{
+       SuperscriptBox["d", "2"], " ", 
+       RowBox[{"(", 
+        RowBox[{"F", "+", "\[Gamma]", "+", "\[Lambda]"}], ")"}]}], "+", 
+      RowBox[{"F", " ", "\[Gamma]", " ", "\[Lambda]", " ", 
+       RowBox[{"(", 
+        RowBox[{"a", "+", "\[Mu]", "-", 
+         RowBox[{"a", " ", "\[Mu]"}]}], ")"}]}]}], ")"}]}]], "}"}]], "Output",\
+ExpressionUUID->"7554bdac-e1c0-4011-9268-aa5f0fe2a240"]
+}, Open  ]],
+
+Cell["\<\
+Variable [count] refers to the population size in a pixel of the population \
+raster.  Solve for the birth rate [b] for a given value of [count].\
+\>", "Text",ExpressionUUID->"994b8c52-78f9-4174-8b8d-6822cf9ef3d1"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"bsolve", " ", "=", " ", 
+  RowBox[{"Solve", "[", 
+   RowBox[{
+    RowBox[{"Pop", "\[Equal]", "count"}], ",", " ", "b"}], "]"}]}]], "Input",E\
+xpressionUUID->"3a249cc3-f0a3-4e96-8918-5268e71da9ca"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"{", 
+   RowBox[{"b", "\[Rule]", 
+    FractionBox[
+     RowBox[{"count", " ", "d", " ", 
+      RowBox[{"(", 
+       RowBox[{
+        SuperscriptBox["d", "3"], "+", 
+        RowBox[{
+         SuperscriptBox["d", "2"], " ", "F"}], "+", 
+        RowBox[{
+         SuperscriptBox["d", "2"], " ", "\[Gamma]"}], "+", 
+        RowBox[{"d", " ", "F", " ", "\[Gamma]"}], "+", 
+        RowBox[{
+         SuperscriptBox["d", "2"], " ", "\[Lambda]"}], "+", 
+        RowBox[{"d", " ", "F", " ", "\[Lambda]"}], "+", 
+        RowBox[{"d", " ", "\[Gamma]", " ", "\[Lambda]"}], "+", 
+        RowBox[{"a", " ", "F", " ", "\[Gamma]", " ", "\[Lambda]"}], "+", 
+        RowBox[{"F", " ", "\[Gamma]", " ", "\[Lambda]", " ", "\[Mu]"}], "-", 
+        RowBox[{
+        "a", " ", "F", " ", "\[Gamma]", " ", "\[Lambda]", " ", "\[Mu]"}]}], 
+       ")"}]}], 
+     RowBox[{
+      SuperscriptBox["d", "3"], "+", 
+      RowBox[{
+       SuperscriptBox["d", "2"], " ", "F"}], "+", 
+      RowBox[{
+       SuperscriptBox["d", "2"], " ", "\[Gamma]"}], "+", 
+      RowBox[{"d", " ", "F", " ", "\[Gamma]"}], "+", 
+      RowBox[{"a", " ", "F", " ", "lam", " ", "\[Gamma]"}], "+", 
+      RowBox[{
+       SuperscriptBox["d", "2"], " ", "\[Lambda]"}], "+", 
+      RowBox[{"d", " ", "F", " ", "\[Lambda]"}], "+", 
+      RowBox[{"d", " ", "\[Gamma]", " ", "\[Lambda]"}], "-", 
+      RowBox[{"d", " ", "F", " ", "\[Gamma]", " ", "\[Mu]"}], "-", 
+      RowBox[{"a", " ", "F", " ", "lam", " ", "\[Gamma]", " ", "\[Mu]"}]}]]}],
+    "}"}], "}"}]], "Output",ExpressionUUID->"d2f76664-93ff-44cb-9e2a-\
+c98c820d3499"]
+}, Open  ]],
+
+Cell["Calculate seroprevalence in terms of model parameters. ", "Text",ExpressionUUID->"92d03e44-da90-42a5-9ada-ca151ee398e8"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Rstar", " ", "=", " ", 
+  RowBox[{
+   RowBox[{"FullSimplify", "[", 
+    RowBox[{
+     RowBox[{"r", "/", 
+      RowBox[{"(", "Pop", ")"}]}], "/.", "eq"}], "]"}], "//", 
+   "Flatten"}]}]], "Input",ExpressionUUID->"b5fb890b-ffe5-4ef2-b98f-\
+313adab66bb9"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"-", 
+   FractionBox[
+    RowBox[{"d", " ", "F", " ", "\[Gamma]", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"-", "1"}], "+", "\[Mu]"}], ")"}]}], 
+    RowBox[{
+     SuperscriptBox["d", "3"], "+", 
+     RowBox[{"d", " ", "\[Gamma]", " ", "\[Lambda]"}], "+", 
+     RowBox[{
+      SuperscriptBox["d", "2"], " ", 
+      RowBox[{"(", 
+       RowBox[{"F", "+", "\[Gamma]", "+", "\[Lambda]"}], ")"}]}], "-", 
+     RowBox[{"a", " ", "F", " ", "lam", " ", "\[Gamma]", " ", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"-", "1"}], "+", "\[Mu]"}], ")"}]}], "+", 
+     RowBox[{"d", " ", "F", " ", 
+      RowBox[{"(", 
+       RowBox[{"\[Gamma]", "+", "\[Lambda]", "-", 
+        RowBox[{"\[Gamma]", " ", "\[Mu]"}]}], ")"}]}]}]]}], "}"}]], "Output",E\
+xpressionUUID->"dcb14bbf-9d32-4dfd-8a21-f84fb858ed3c"]
+}, Open  ]],
+
+Cell["\<\
+Solve for the force of infection, F, in terms of seroprevalence. Note that \
+the equilibrium value of foi is made larger by the parameter a. \
+\>", "Text",ExpressionUUID->"be2995b9-ab4b-4ce6-913f-538535ff91bf"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"foi", " ", "=", " ", 
+  RowBox[{
+   RowBox[{"FullSimplify", "[", 
+    RowBox[{"Solve", "[", 
+     RowBox[{
+      RowBox[{"hsero", " ", "\[Equal]", " ", "Rstar"}], ",", " ", "F"}], 
+     "]"}], "]"}], "//", "Flatten"}]}]], "Input",ExpressionUUID->"04d0dada-\
+7e7e-4425-8d25-d7b112ff88f3"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"F", "\[Rule]", 
+   RowBox[{"-", 
+    FractionBox[
+     RowBox[{"d", " ", "hsero", " ", 
+      RowBox[{"(", 
+       RowBox[{"d", "+", "\[Gamma]"}], ")"}], " ", 
+      RowBox[{"(", 
+       RowBox[{"d", "+", "\[Lambda]"}], ")"}]}], 
+     RowBox[{
+      RowBox[{
+       SuperscriptBox["d", "2"], " ", "hsero"}], "+", 
+      RowBox[{"d", " ", "hsero", " ", "\[Lambda]"}], "-", 
+      RowBox[{"a", " ", "hsero", " ", "lam", " ", "\[Gamma]", " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"-", "1"}], "+", "\[Mu]"}], ")"}]}], "+", 
+      RowBox[{"d", " ", "\[Gamma]", " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"-", "1"}], "+", "hsero", "+", "\[Mu]", "-", 
+         RowBox[{"hsero", " ", "\[Mu]"}]}], ")"}]}]}]]}]}], "}"}]], "Output",E\
+xpressionUUID->"dd72a1c9-1b24-4a28-9805-e12ae0baf4be"]
+}, Open  ]],
+
+Cell["\<\
+Rewrite the solution for [b], defined in [bsolve], with the force of \
+infection terms F replaced with the expression above\
+\>", "Text",ExpressionUUID->"290ebe75-75a4-4d3f-8d73-abbe35b16634"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"bsolve", " ", "=", " ", 
+  RowBox[{"FullSimplify", "[", 
+   RowBox[{"bsolve", "/.", "foi"}], "]"}]}]], "Input",ExpressionUUID->\
+"fdb2205c-59df-4a0a-8315-55c4ff532101"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"{", 
+   RowBox[{"b", "\[Rule]", 
+    RowBox[{"-", 
+     FractionBox[
+      RowBox[{"count", " ", 
+       RowBox[{"(", 
+        RowBox[{"d", "+", 
+         RowBox[{"a", " ", "hsero", " ", 
+          RowBox[{"(", 
+           RowBox[{"lam", "-", "\[Lambda]"}], ")"}], " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"-", "1"}], "+", "\[Mu]"}], ")"}]}], "+", 
+         RowBox[{"d", " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"-", "1"}], "+", "hsero"}], ")"}], " ", "\[Mu]"}], "+", 
+         RowBox[{"hsero", " ", "\[Lambda]", " ", "\[Mu]"}]}], ")"}]}], 
+      RowBox[{
+       RowBox[{"-", "1"}], "+", "\[Mu]"}]]}]}], "}"}], "}"}]], "Output",Expres\
+sionUUID->"005a9ede-0a6b-46b3-a5e8-8d0ab188305e"]
+}, Open  ]],
+
+Cell["\<\
+The rate of new cases of Lassa is F*s. Calculate this, and rewrite everything \
+in terms of seroprevalence. The decrease in s at equilibrium that is caused \
+by a is exactly cancelled by the increase in force of infection that is \
+caused by a. \
+\>", "Text",ExpressionUUID->"256d7114-002d-4029-b566-c3e82ac8bf06"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"NewCaseRate", " ", "=", " ", 
+  RowBox[{
+   RowBox[{"FullSimplify", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{"F", "/.", "foi"}], ")"}], "*", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"s", "/.", "eq"}], "/.", "foi"}], ")"}]}], "/.", "bsolve"}], 
+    "]"}], "//", "Flatten"}]}]], "Input",ExpressionUUID->"13aca1fb-b81e-434f-\
+98fa-90bb0b3e99d9"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"-", 
+   FractionBox[
+    RowBox[{"count", " ", "hsero", " ", 
+     RowBox[{"(", 
+      RowBox[{"d", "+", "\[Gamma]"}], ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{"d", "+", "\[Lambda]"}], ")"}]}], 
+    RowBox[{"\[Gamma]", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"-", "1"}], "+", "\[Mu]"}], ")"}]}]]}], "}"}]], "Output",Expres\
+sionUUID->"f940c71d-2bb9-4d0a-a322-d2de4561ccd9"]
+}, Open  ]]
+}, Open  ]]
 }, Open  ]]
 },
-WindowSize->{1920, 1052},
-WindowMargins->{{1920, Automatic}, {0, Automatic}},
+WindowSize->{1440, 780},
+WindowMargins->{{219, Automatic}, {Automatic, 88}},
 Visible->True,
 ScrollingOptions->{"VerticalScrollRange"->Fit},
 ShowCellBracket->Automatic,
@@ -620,6 +1072,53 @@ Cell[15807, 503, 338, 9, 31, "Input",ExpressionUUID->"28eac22c-8577-412a-808d-ae
 Cell[16148, 514, 108, 1, 35, "Output",ExpressionUUID->"a289e475-f8a1-435b-8311-4829de7eec70"]
 }, Open  ]],
 Cell[16271, 518, 201, 3, 35, "Text",ExpressionUUID->"ac93e7b2-fb5a-4397-b90a-b99444692a5a"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[16521, 527, 128, 0, 98, "Title",ExpressionUUID->"70d54b41-9157-4034-8dda-354502677e36"],
+Cell[16652, 529, 376, 5, 58, "Text",ExpressionUUID->"f61fcaa1-5aeb-4072-92f3-3933facd34e0"],
+Cell[CellGroupData[{
+Cell[17053, 538, 89, 0, 65, "Subchapter",ExpressionUUID->"8359d092-f296-4924-ac2f-44bd0a82138b"],
+Cell[17145, 540, 190, 3, 35, "Text",ExpressionUUID->"1464e4fa-61bf-4515-bac7-771e53276444"],
+Cell[17338, 545, 1084, 32, 101, "Input",ExpressionUUID->"fea2a55c-c95f-456e-912f-23b6c94378d4"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[18459, 582, 198, 5, 65, "Subchapter",ExpressionUUID->"6db9f21f-ddc9-4383-8ef3-524f635138a8"],
+Cell[18660, 589, 240, 4, 35, "Text",ExpressionUUID->"961d8c79-dedd-4235-a68f-01c9da908a93"],
+Cell[CellGroupData[{
+Cell[18925, 597, 539, 13, 31, "Input",ExpressionUUID->"42b7d06d-239d-4e1b-a0c8-aa2694a07212"],
+Cell[19467, 612, 3354, 88, 109, "Output",ExpressionUUID->"3c641703-d4fb-4a31-9be6-dabcf6967730"]
+}, Open  ]],
+Cell[22836, 703, 263, 4, 35, "Text",ExpressionUUID->"9482acc8-dd24-4bc6-a542-e4099cd9ddd7"],
+Cell[CellGroupData[{
+Cell[23124, 711, 301, 8, 31, "Input",ExpressionUUID->"03e0ed29-5af3-49f1-ba5f-60d71cd49e16"],
+Cell[23428, 721, 1354, 36, 66, "Output",ExpressionUUID->"7554bdac-e1c0-4011-9268-aa5f0fe2a240"]
+}, Open  ]],
+Cell[24797, 760, 224, 3, 35, "Text",ExpressionUUID->"994b8c52-78f9-4174-8b8d-6822cf9ef3d1"],
+Cell[CellGroupData[{
+Cell[25046, 767, 220, 5, 31, "Input",ExpressionUUID->"3a249cc3-f0a3-4e96-8918-5268e71da9ca"],
+Cell[25269, 774, 1603, 38, 62, "Output",ExpressionUUID->"d2f76664-93ff-44cb-9e2a-c98c820d3499"]
+}, Open  ]],
+Cell[26887, 815, 126, 0, 35, "Text",ExpressionUUID->"92d03e44-da90-42a5-9ada-ca151ee398e8"],
+Cell[CellGroupData[{
+Cell[27038, 819, 276, 8, 31, "Input",ExpressionUUID->"b5fb890b-ffe5-4ef2-b98f-313adab66bb9"],
+Cell[27317, 829, 850, 23, 58, "Output",ExpressionUUID->"dcb14bbf-9d32-4dfd-8a21-f84fb858ed3c"]
+}, Open  ]],
+Cell[28182, 855, 220, 3, 35, "Text",ExpressionUUID->"be2995b9-ab4b-4ce6-913f-538535ff91bf"],
+Cell[CellGroupData[{
+Cell[28427, 862, 311, 8, 31, "Input",ExpressionUUID->"04d0dada-7e7e-4425-8d25-d7b112ff88f3"],
+Cell[28741, 872, 856, 23, 58, "Output",ExpressionUUID->"dd72a1c9-1b24-4a28-9805-e12ae0baf4be"]
+}, Open  ]],
+Cell[29612, 898, 202, 3, 35, "Text",ExpressionUUID->"290ebe75-75a4-4d3f-8d73-abbe35b16634"],
+Cell[CellGroupData[{
+Cell[29839, 905, 192, 4, 31, "Input",ExpressionUUID->"fdb2205c-59df-4a0a-8315-55c4ff532101"],
+Cell[30034, 911, 783, 22, 56, "Output",ExpressionUUID->"005a9ede-0a6b-46b3-a5e8-8d0ab188305e"]
+}, Open  ]],
+Cell[30832, 936, 324, 5, 58, "Text",ExpressionUUID->"256d7114-002d-4029-b566-c3e82ac8bf06"],
+Cell[CellGroupData[{
+Cell[31181, 945, 405, 12, 31, "Input",ExpressionUUID->"13aca1fb-b81e-434f-98fa-90bb0b3e99d9"],
+Cell[31589, 959, 433, 13, 57, "Output",ExpressionUUID->"f940c71d-2bb9-4d0a-a322-d2de4561ccd9"]
+}, Open  ]]
 }, Open  ]]
 }, Open  ]]
 }
