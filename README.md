@@ -184,8 +184,8 @@ contained in the following scripts:
 This script defines the function Prep.Reservoir.Data. The function
 accepts a string that specifies the focal species. For now, this
 string can only take on the value "Mastomys natalensis", but other
-species will soon be added. This function processes Mastomys
-natalensis presence data. The output is a dataframe that contains
+species will eventually be added. This function processes *M.
+natalensis* presence data. The output is a dataframe that contains
 Latitude, Longitude, and associated environmental predictors of pixels
 that contain Mastomys natalensis captures, as well as background
 captures of other Murids.
@@ -195,7 +195,7 @@ captures of other Murids.
 This script defines the Calc.Sig.Reservoir.Preds function. The
 function accepts a species name (string), as well as the dataframe
 output of Prep.Reservoir.Data, and outputs a list of predictors
-determined to significantly vary with the Mastomys natalensis response
+determined to significantly vary with the *M. natalensis* response
 variable. Here, absence refers to background captures of Murid
 rodents. Significance is determined by a Wilcox test with a threshold
 of p = 0.05.  Significant predictors, in turn, will be used to train
@@ -275,15 +275,16 @@ described in the Reservoir_Layer directory.
 
 - Data: contains the datasets that describe LASV presence and absence
 in rodents, as well as data on serosurveys in humans. The Excel file
-"Lassa_Occurrence_Data" contains a spreadsheets named 1) ``Genbank:''
-LASV records in *M. natalensis* found on GenBank; 2) ``Raw_Lassa_Literature:''
-LASV records in humans and rodents that were found
-through a literature search; and 3) ``Cleaned_Lassa_Literature:''
-cleaned version of LASV records in literature that is used to produce
-a CSV file that, in turn, is read into the model pipeline. Cleaning
-involved removing human serosurveys that were nonrandom (e.g., tested
-individuals with symptoms, individual missionaries), and removing
-entries that did not specifically test *M. natalensis* rodents.
+"Lassa_Occurrence_Data" contains 3 spreadsheets. The "Genbank"
+spreadsheet contains LASV records in *M. natalensis* found on GenBank;
+the "Raw_Lassa_Literature" spreadsheet contains LASV records in humans
+and rodents that were found through a literature search; and the
+"Cleaned_Lassa_Literature" spreadsheet contains cleaned version of
+LASV records in literature that is used to produce a CSV file that, in
+turn, is read into the model pipeline. Cleaning involved removing
+human serosurveys that were nonrandom (e.g., tested individuals with
+symptoms, individual missionaries), and removing entries that did not
+specifically test *M. natalensis* rodents.
 
 - Figures_Fits
 
@@ -304,7 +305,7 @@ train a set of 25 boosted classification trees
 This script defines the Prep.Pathogen.Data function. This function
 processes Lassa presence/absence data from published surveys of
 rodents and humans. The function returns a dataframe containing
-*Mastomys natalensis* Lassa presence/absence data. The rodent
+*M. natalensis* Lassa presence/absence data. The rodent
 dataframe contains environmental predictors that are used to train the
 pathogen layer of the model. Another dataset that contains human
 serosurvey data is saved to a csv file
