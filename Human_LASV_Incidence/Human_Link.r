@@ -209,7 +209,7 @@ png(filename = paste(fold.name,'/Pred_vs_Fit.png',sep=''),
 par(mar = c(3.25,3.25,0.5,0.5))
 plot(PropAb~Dx, data = human.test.dat, cex = sc*NumTestAb,
      xlab = '', ylab = '',
-     main = '', ylim = c(0,0.6), xlim = c(-0.1,0.85))
+     main = '', ylim = c(0,0.6), xlim = c(-0.05,0.85))
 mtext(side = 1, text = as.expression(bquote('Predicted Risk of Lassa ( D'['x']~')')), line = 2.4)
 mtext(side = 2, text = 'Seroprevalence', line = 2.4)
 legend(x = 'topleft', legend = c('10', '100', '400'), pch = c(1,1,1), pt.cex = sc*c(10,100,400))
