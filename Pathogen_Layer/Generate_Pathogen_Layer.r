@@ -92,9 +92,10 @@ for(ii in 1:nrow(hypers.dat)){
     rodlsv.survey.dat <- Prep.Pathogen.Data(hypers.dat[ii,])[[1]]
 
     ## Reviewer requested to find the mean LASV seroprevalence in LASV+ rodent sites
-    ## a = subset(rodlsv.survey.dat, ArenaStat==1 & NumTestAb > 0, select = c('NumTestAb','NumPosAb', 'PropAb'))
-    ## a$PropAb <- a$NumPosAb/a$NumTestAb
-    ## mean(a$PropAb)
+    ## LASV.sites.sero = subset(rodlsv.survey.dat, ArenaStat==1 & NumTestAb > 0,
+    ##                          select = c('NumTestAb','NumPosAb', 'PropAb'))
+    ## LASV.sites.sero$PropAb <- a$NumPosAb/a$NumTestAb
+    ## mean(LASV.sites.sero$PropAb)
     ## ## Mean Ab is 0.24; 24%
     
     ## Map the prepared dataset
