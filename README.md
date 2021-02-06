@@ -5,7 +5,7 @@ This directory contains the scripts and data-sets used to build the
 model that is outlined in the paper: 
 
 Basinski, AJ *et al*, 2020. Bridging the Gap: Using reservoir ecology and
-human serosurveys to estimate Lassa virus incidence in West
+human serosurveys to estimate Lassa virus spillover in West
 Africa. Submitted to PLOS Computational Biology. 
 
 See the manuscript for full details. The scripts in this directory
