@@ -52,7 +52,6 @@ installing the following packages:
 | Parallel processes           |  parallel                   |
 | Boosted models               |  dismo, gbm                 |
 | Plotting                     |  ggplot2, gridExtra, fields, ggthemes, viridis | 
-| Neg. Binomial                | MASS, pscl, DescTools       |
 | Misc                         | verification, dplyr, plyr   |
 | <img width=100/>             |<img width=200/>             |
 
