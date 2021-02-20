@@ -156,6 +156,14 @@ human.test.dat$res <- residuals(bin.mod, type = 'deviance')
 human.test.dat$y.linear <- with(human.test.dat,
                                 Dx*qb.mod$coefficients['Dx'] + qb.mod$coefficients['(Intercept)'])
 
+## Evaluate correlation between human seroprevalence and predictions
+corr <- cor(human.test.dat$fitted, human.test.dat$PropAb)
+## 0.3272
+corr.weighted <- cov.wt(cbind(human.test.dat$fitted, human.test.dat$PropAb),
+                        wt = human.test.dat$NumTestAb,
+                        cor = TRUE)$cor[2,1]
+## 0.3975
+
 
 ## ---Make a plot of the deviance residuals
 png(filename = paste(fold.name,'/Deviance_Residuals.png',sep=''),
