@@ -164,9 +164,12 @@ corr.weighted <- cov.wt(cbind(human.test.dat$fitted, human.test.dat$PropAb),
                         cor = TRUE)$cor[2,1]
 ## 0.3975
 
+<<<<<<< HEAD
 ## Calculate the fraction of deviance that is explained
 dev.explained <- 1 - qbin.summ$deviance / qbin.summ$null.deviance
 ## 0.1565705
+=======
+>>>>>>> 6064b7a0c886662acc9cc5ef093853004c3f9824
 
 ## ---Make a plot of the deviance residuals
 png(filename = paste(fold.name,'/Deviance_Residuals.png',sep=''),
