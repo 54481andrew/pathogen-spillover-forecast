@@ -4,9 +4,11 @@
 This directory contains the scripts and data-sets used to build the
 model that is outlined in the paper: 
 
-Basinski, AJ *et al*, 2020. Bridging the Gap: Using reservoir ecology and
+Basinski AJ, Fichet-Calvet E, Sjodin AR, Varrelman TJ, Remien CH,
+Layman NC, et al. (2021) Bridging the gap: Using reservoir ecology and
 human serosurveys to estimate Lassa virus spillover in West
-Africa. Submitted to PLOS Computational Biology. 
+Africa. PLoS Comput Biol 17(3):
+e1008811. https://doi.org/10.1371/journal.pcbi.1008811
 
 See the manuscript for full details. The scripts in this directory
 describe a machine-learning framework that predicts the number of
