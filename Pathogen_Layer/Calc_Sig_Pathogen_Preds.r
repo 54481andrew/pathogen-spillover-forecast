@@ -42,9 +42,9 @@ Calc.Sig.Pathogen.Preds <- function(dataset){
             print(p)
         })
     }
-    pdf(file = paste0('Figures_Fits/', prefix, '/',fold,'/',
-                      'Sig_Pathogen_Predictors.pdf'),
-        width = 15, height = 10)
+    png(file = paste0('Figures_Fits/', prefix, '/',fold,'/',
+                      'Sig_Pathogen_Predictors.png'),
+        width = 15, height = 10, units = 'in', res = 400)
     grid.arrange(grobs = graph.list)
     dev.off()
     

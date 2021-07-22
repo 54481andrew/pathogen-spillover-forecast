@@ -23,7 +23,7 @@ require(viridis)
 
 
 ## Directory name that will contain output for all hyperparameter sets
-prefix <- 'pathogen_v4'
+prefix <- 'pathogen_v5'
 
 ## set version of random number generator to use to ensure
 ## reproducibility across R versions
@@ -56,8 +56,8 @@ source("Train_Pathogen_Learners.r")
 ## mllr - minus log10 of the learning rate
 ## lmt - log10 of the max.trees parameter
 hypers.dat <- expand.grid(nboots = 25,
-                          set.ambiguous.to = c(1,NA),
-                          min.test = c(5,10),
+                          set.ambiguous.to = c(NA),
+                          min.test = c(5),
                           tree.complexity = c(1),
                           mllr = 3,
                           lmt = 7

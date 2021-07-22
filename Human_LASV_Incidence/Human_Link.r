@@ -39,8 +39,8 @@ set.seed(1)
 ## predictions. 
 set.ambiguous.to <- NA
 min.test <- 5
-grid.name <- paste0('human_v4_ambi',set.ambiguous.to, '_mint_', min.test) ## name for model.dat dataframe
-prefix.masto <- 'reservoir_v4' ## prefix used in Generate_Reservoir_Layer
+grid.name <- paste0('human_v5_ambi',set.ambiguous.to, '_mint_', min.test) ## name for model.dat dataframe
+prefix.masto <- 'reservoir_v5' ## prefix used in Generate_Reservoir_Layer
 masto.fold <- 'Mn_pa_nboots_25_nbg_Same_tc_1_mllr_2_lmt_7'
 
 prefix.lassa <-  'pathogen_v4' ## prefix used in Generate_Lassa_Layer

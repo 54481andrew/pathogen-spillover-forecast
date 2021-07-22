@@ -75,7 +75,8 @@ train.pathogen.learners <- function(rodlsv.survey.dat, hypers.i = NULL){
             ntries = ntries + 1
         } ## End While
 
-        ## Test performance on out-of-bag presences and pseudoabsence points
+        ## Test performance on out-of-bag presences and pseudoabsence points. We'll store
+        ## AUC and accuracy. 
 
         ## Predict and assess gbm.mod on test.survey.data
         pred.rast <- predict(all.stack[[var.names]], gbm.mod, n.trees = gbm.mod$n.trees,
@@ -85,13 +86,47 @@ train.pathogen.learners <- function(rodlsv.survey.dat, hypers.i = NULL){
         rocArea.model = roc.area(test.survey.data$ArenaStat,
                                       model.predictions)$A
 
+        ## Calculate accuracy
+        model.preds <- 1*(model.predictions > 0.5)
+        acc = mean(model.preds == test.survey.data$ArenaStat)
+
+        ## Calculate adjusted accuracy
+        major.class <- max(table(test.survey.data$ArenaStat)) ## Majority class
+        adj.acc = (sum(model.preds == test.survey.data$ArenaStat) - major.class) /
+            (nrow(test.survey.data) - major.class)
+        
+        
+        ## Calculate deviance based statistics
+        null.predictions <- mean(train.survey.data$ArenaStat)
+        model.ll <- sum(test.survey.data$ArenaStat*log(model.predictions) +
+                           (1-test.survey.data$ArenaStat)*log(1-model.predictions))
+        ## model.deviance <- -2*model.ll
+        null.ll <- sum(test.survey.data$ArenaStat*log(null.predictions) +
+                              (1-test.survey.data$ArenaStat)*log(1-null.predictions))
+        ## null.deviance <- -2*null.ll
+        ## D2 <- (null.deviance - model.deviance)/null.deviance
+
+        ## Calculate McFadden's pseudo-r-squared
+        mcr2 <- 1 - model.ll/null.ll 
+        
         ## Save fit statistics to file
         tree.dat <- data.frame(boot.i = boot.i, n.tree = gbm.mod$n.trees, max.tree = max.trees,
-                               model.auc = rocArea.model)
+                               model.auc = rocArea.model, model.acc = acc,
+                               model.ll = model.ll, null.ll = null.ll,
+                               mcr2 = mcr2, adj.acc = adj.acc)
         write.table(tree.dat, file = tree.filename,
                     col.names = !file.exists(tree.filename), row.names = FALSE,
                     append = file.exists(tree.filename))
 
+        ## Save all predictions and actual test data
+        store.test <- data.frame(boot.i = boot.i, model = model.predictions,
+                                 null = null.predictions,
+                                 test = test.survey.data$ArenaStat)
+
+        write.table(store.test, file = test.filename,
+                    col.names = !file.exists(test.filename), row.names = FALSE,
+                    append = file.exists(test.filename))
+        
         ## Save model and tif prediction of this bootstrap fit
         mod.filename = paste(models.folder, '/amod_',boot.i,'.rds', sep = '')
         saveRDS(gbm.mod, file = mod.filename)
@@ -108,7 +143,10 @@ train.pathogen.learners <- function(rodlsv.survey.dat, hypers.i = NULL){
 
     tree.filename = paste0('Figures_Fits/', prefix, '/',
                            fold, '/tree.dat')
+    test.filename = paste0('Figures_Fits/', prefix, '/',
+                           fold, '/test.dat')
     unlink(tree.filename)
+    unlink(test.filename)
 
     print('Bootstrapping model fits', quote = FALSE)
 

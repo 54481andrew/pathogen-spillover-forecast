@@ -43,7 +43,8 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
                            fold, '/tree.dat')
     assess.filename = paste0('Figures_Fits/', prefix, '/',
                            fold, '/assess.dat')
-
+    test.filename = paste0('Figures_Fits/', prefix, '/',
+                           fold, '/test.dat')
     ## Divide the dataset into two dataframes: the first only contains presences,
     ## the second only background
     presence.data <- dataset[dataset$Presence==1,]
@@ -95,7 +96,8 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
         ##---
 
         ## Test performance on out-of-bag presences and pseudoabsence points.
-        ## Assess AUC both with and without pairwise distance sampling.
+        ## Assess AUC both with and without pairwise distance sampling, as well as
+        ## accuracy. 
 
         ## Obtain out-of-bag presences
         wi.test.pres <- (1:nrow(presence.data))[-wi.train.pres]
@@ -111,8 +113,10 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
 
         ## Set up a dataframe to store things in
         tree.dat <- data.frame(boot.i = boot.i, n.tree = gbm.mod$n.trees, max.tree = max.trees,
-                               model.oob.auc = NA, model.oob.auc.pwd = NA)
+                               model.oob.auc = NA, model.oob.auc.pwd = NA,
+                               model.oob.acc = NA, model.oob.acc.pwd = NA)
 
+        
         ## Method 1: Form the test dataset without pairwise distance sampling
         wi.test.abs.1 <- sample(nrow(all.test.background),
                                 length(wi.test.pres),
@@ -125,6 +129,38 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
                                      y = test.dataset[,c('Longitude', 'Latitude')])
         tree.dat$model.oob.auc <- roc.area(test.dataset$Presence, model.predictions)$A
 
+        
+        ## Calculate accuracy of model on test data chosen without pairwise distance sampling
+        model.preds <- 1*(model.predictions > 0.5)
+        tree.dat$model.oob.acc = mean(1*(model.preds == test.dataset$Presence))
+
+        ## Next calculate adjusted accuracy
+        major.class <- max(table(test.dataset$Presence)) ## Majority class
+        tree.dat$model.oob.adj.acc = (sum(model.preds == test.dataset$Presence) - major.class)/
+            (length(test.dataset$Presence) - major.class)
+
+        ## Calculate oob log likelihood and McFadden's pseudoR2 on test data
+        null.predictions <- mean(train.dataset$Presence)
+        model.ll <- sum(test.dataset$Presence*log(model.predictions) +
+                     (1-test.dataset$Presence)*log(1-model.predictions))
+        ## model.deviance <- -2*model.ll
+        null.ll <- sum(test.dataset$Presence*log(null.predictions) +
+                    (1-test.dataset$Presence)*log(1-null.predictions))
+        ## null.deviance <- -2*null.ll
+        ## D2 <- (null.deviance - model.deviance)/null.deviance
+        
+        ## Calculate McFadden's pseudo-r-squared
+        mcr2 <- 1 - model.ll/null.ll 
+        tree.dat$null.oob.ll <- null.ll
+        tree.dat$model.oob.ll <- model.ll
+        tree.dat$model.oob.mcr2 <- mcr2
+        
+        ## Save a copy of test data and predictions
+        store.test <- data.frame(boot.i = boot.i, model = model.predictions,
+                                 null = null.predictions,
+                                 test = test.dataset$Presence, pwd = FALSE)
+
+        
         ## Method 2: Use pairwise-distance sampling to find appropriate set of test absences
         wi.test.background <- pwdSample(fixed = test.presences[,c('Longitude', 'Latitude')],
                                         sample = all.test.background[,c('Longitude', 'Latitude')],
@@ -142,8 +178,41 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
         ## Extract and predict on test.dataset
         model.predictions <- extract(x = pred.rast,
                                      y = test.dataset[,c('Longitude', 'Latitude')])
+
+
         tree.dat$model.oob.auc.pwd <- roc.area(test.dataset$Presence, model.predictions)$A
 
+        ## Calculate oob accuracy with pairwise sampled test dataset
+        model.preds <- 1*(model.predictions > 0.5)
+        tree.dat$model.oob.acc.pwd = mean(1*(model.preds == test.dataset$Presence))
+
+        ## Next calculate adjusted accuracy
+        major.class <- max(table(test.dataset$Presence)) ## Majority class
+        tree.dat$model.oob.adj.acc.pwd = (sum(model.preds == test.dataset$Presence)-major.class)/
+            (length(test.dataset$Presence) - major.class)
+
+        ## Calculate oob log likelihood and McFadden's pseudoR2 on pairwise sampled test data
+        model.ll <- sum(test.dataset$Presence*log(model.predictions) +
+                           (1-test.dataset$Presence)*log(1-model.predictions))
+        ## model.deviance <- -2*model.ll
+        null.ll <- sum(test.dataset$Presence*log(null.predictions) +
+                              (1-test.dataset$Presence)*log(1-null.predictions))
+        ## null.deviance <- -2*null.ll
+        ## D2 <- (null.deviance - model.deviance)/null.deviance
+
+        ## Calculate McFadden's pseudo-r-squared
+        mcr2 <- 1 - model.ll/null.ll 
+
+        ## Save a copy of predictions and test data
+        store.test.pwd <- data.frame(boot.i = boot.i, model = model.predictions,
+                                     null = null.predictions,
+                                 test = test.dataset$Presence, pwd = TRUE)
+
+        
+        tree.dat$null.oob.ll.pwd <- null.ll
+        tree.dat$model.oob.ll.pwd <- model.ll
+        tree.dat$model.oob.mcr2.pwd <- mcr2
+        
         ### Assess by species for internal use 
 
         spec.names <- unique(paste(dataset$Species))
@@ -160,7 +229,11 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
                     col.names = FALSE, row.names = FALSE,
                     append = file.exists(assess.filename))
 
-
+        ## Save all predictions and actual test data
+        store.test.all <- rbind(store.test, store.test.pwd)
+        write.table(store.test.all, file = test.filename,
+                    col.names = !file.exists(test.filename), row.names = FALSE,
+                    append = file.exists(test.filename))
 
         ###
 
@@ -184,7 +257,8 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
 
     unlink(tree.filename)
     unlink(assess.filename)
-
+    unlink(test.filename)
+        
     print('Bootstrapping model fits', quote = FALSE)
 
     starttime <- Sys.time()
@@ -324,3 +398,5 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
     unlink(models.folder, recursive = TRUE)
 
 } ## End function
+
+# LocalWords:  dataset

@@ -47,9 +47,9 @@ Calc.Sig.Reservoir.Preds <- function(Species, dataset){
             print(p)
         })
     }
-    pdf(file = paste0('Figures_Fits/', prefix, '/',fold,'/',
-                      'Sig_Reservoir_Predictors_',Species.name,'.pdf'),
-        width = 25, height = 15)
+    png(file = paste0('Figures_Fits/', prefix, '/',fold,'/',
+                      'Sig_Reservoir_Predictors_',Species.name,'.png'),
+        width = 25, height = 15, units = 'in', res = 400)
     grid.arrange(grobs = graph.list)
     dev.off()
     
