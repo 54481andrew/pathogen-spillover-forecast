@@ -39,11 +39,11 @@ set.seed(1)
 ## predictions. 
 set.ambiguous.to <- NA
 min.test <- 5
-grid.name <- paste0('human_v5_ambi',set.ambiguous.to, '_mint_', min.test) ## name for model.dat dataframe
-prefix.masto <- 'reservoir_v5' ## prefix used in Generate_Reservoir_Layer
+grid.name <- paste0('human_v6_ambi',set.ambiguous.to, '_mint_', min.test) ## name for model.dat dataframe
+prefix.masto <- 'reservoir_v6' ## prefix used in Generate_Reservoir_Layer
 masto.fold <- 'Mn_pa_nboots_25_nbg_Same_tc_1_mllr_2_lmt_7'
 
-prefix.lassa <-  'pathogen_v4' ## prefix used in Generate_Lassa_Layer
+prefix.lassa <-  'pathogen_v6' ## prefix used in Generate_Lassa_Layer
 lassa.fold <- paste0("pa_nboots_25_1_mllr_3_lmt_7_ambi_", set.ambiguous.to, "_mintest_",min.test)
 
 
@@ -59,11 +59,11 @@ mu = 0.02 ## LASV mortality, Pr(Infected dies) = 0.02, from McCormick, Webb, Kre
 
 ## Load in Africa shapefiles needed for plotting
 storage.fold <- '../Storage'
-foc.shp.ogr <- readOGR(dsn = paste(storage.fold, '/Shapefiles/West_Africa', sep = ''),
+foc.shp.ogr <- readOGR(dsn = paste0(storage.fold, '/Shapefiles/West_Africa'),
                        layer = 'foc', verbose = FALSE)
-africa.ogr <- readOGR(dsn = paste(storage.fold, '/Shapefiles/Africa', sep = ''),
+africa.ogr <- readOGR(dsn = paste0(storage.fold, '/Shapefiles/Africa'),
                        layer = 'Africa', verbose = FALSE)
-masto.rangemap <-readOGR(dsn = paste(storage.fold, '/Shapefiles/Masto_Range',sep=''),
+masto.rangemap <-readOGR(dsn = paste0(storage.fold, '/Shapefiles/Masto_Range'),
                          layer = 'data_0', verbose = FALSE)
 
 
@@ -110,7 +110,7 @@ Dx = Lassa.Risk*Masto.Risk
 heat.cols <- viridis(120, begin = 0.1, end = 1, option = 'D')
 xlims = c(-18,16)
 ylims = c(16, 16.5)
-png(file = paste(fold.name, '/Product_Risk_Layer.png', sep = ''),
+png(file = paste0(fold.name, '/Combined_Risk_Layer.png'),
     width = 6, height = 4, units = 'in', res = 400)
 par(mai = 1*c(0.2,0.2,0.2,0.6))
 image.plot(Dx, col = heat.cols, zlim = c(0, 1),
@@ -122,6 +122,9 @@ mtext(text = as.expression('Combined Risk ('~'D'['X']~' = D'['M'] %.% 'D'['L']~'
 plot(foc.shp.ogr, add = TRUE, bty = 'n', asp = 1)
 plot(rgeos::gIntersection(foc.shp.ogr, masto.rangemap), add = TRUE, bty = 'n', asp = 1, lwd = 3)
 dev.off()
+
+## Save raster copy of the Dx layer
+writeRaster(Dx, filename = paste0(fold.name, '/Combined_Risk_Layer.tif')
 
 ## ---- Regress human seroprevalence on D_X layer
 
@@ -168,6 +171,16 @@ corr.weighted <- cov.wt(cbind(human.test.dat$fitted, human.test.dat$PropAb),
 dev.explained <- 1 - qbin.summ$deviance / qbin.summ$null.deviance
 ## 0.1565705
 
+## Save the above metrics to file (glm.pval is the pvalue associated with Dx coefficient)
+metric.output = data.frame(corr = corr, corr.weighted = corr.weighted,
+                           glm.pval = coef(qbin.summ)['Dx','Pr(>|t|)'],
+                           glm.frac.dev = dev.explained)
+
+write.csv(metric.output, paste0(fold.name, '/metrics_output.csv'))
+
+## Save quasibinomial GLM model output          
+capture.output(qbin.summ, file = paste0(fold.name, '/glm_summary')
+          
 ## ---Make a plot of the deviance residuals
 png(filename = paste(fold.name,'/Deviance_Residuals.png',sep=''),
     width = 4, height = 4, units = 'in', res = 400)
@@ -367,16 +380,15 @@ cases.dat$Cases.high <- round(merged.cases.dat$Cases.high/1000, 1)
 cases.dat$Rate.high <- round(1000*merged.cases.dat$Rate.high, 1)
 
 ## Write case data and GLM output to file 
-write.table(cases.dat, file = paste(fold.name, '/foc_case', sep = ''))
-write.table(org.cases.dat, file = paste(fold.name, '/org_foc_case', sep = ''))
-capture.output(qbin.summ, file = paste(fold.name, '/glm_summary', sep = ''))
+write.table(cases.dat, file = paste0(fold.name, '/foc_case'))
+##write.table(org.cases.dat, file = paste0(fold.name, '/org_foc_case')
 
-
-print(Sys.time() - starttime)
-
-## Simple dataframe with LASV case count totals
+## Create a summary dataframe, saved to file as csv, that describes model
+## performance and case totals
 tot.model <- cases.dat[cases.dat$Country=='Total','Cases']
 tot.round <- round(tot.model,1) ## Base estimates
 tot.high.round <- round(cases.dat[cases.dat$Country=='Total', 'Cases.high'], 1) ## with Reinfection
 output <- data.frame(type = 'model', low.est = tot.round, high.est = tot.high.round,
                      stringsAsFactors = FALSE)
+
+print(Sys.time() - starttime)

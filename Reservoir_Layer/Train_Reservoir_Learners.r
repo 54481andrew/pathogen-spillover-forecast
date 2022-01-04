@@ -40,11 +40,12 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
 
     ## Model fit statistics are stored here
     tree.filename = paste0('Figures_Fits/', prefix, '/',
-                           fold, '/tree.dat')
-    assess.filename = paste0('Figures_Fits/', prefix, '/',
-                           fold, '/assess.dat')
+                           fold, '/tree_metrics.dat')
+    sp.pred.filename = paste0('Figures_Fits/', prefix, '/',
+                           fold, '/species_predictions.dat')
     test.filename = paste0('Figures_Fits/', prefix, '/',
-                           fold, '/test.dat')
+                           fold, '/test_predictions.dat')
+
     ## Divide the dataset into two dataframes: the first only contains presences,
     ## the second only background
     presence.data <- dataset[dataset$Presence==1,]
@@ -225,9 +226,9 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
             spec.dat[1,which(spec==spec.names)] <- m
             spec.dat[1, length(spec.names) + which(spec==spec.names)] <- s
         }
-        write.table(spec.dat, file = assess.filename,
+        write.table(spec.dat, file = sp.pred.filename,
                     col.names = FALSE, row.names = FALSE,
-                    append = file.exists(assess.filename))
+                    append = file.exists(sp.pred.filename))
 
         ## Save all predictions and actual test data
         store.test.all <- rbind(store.test, store.test.pwd)
@@ -249,31 +250,32 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
         tif.filename = paste(models.folder,'/amod_',boot.i,'.tif', sep = '')
         writeRaster(pred.rast, filename = tif.filename, overwrite = TRUE)
 
-        print(paste('--Finished Bootset: ', boot.i, '; Elapsed Time: ', Sys.time() - starttime), quote = FALSE)
-        print(paste('----- gbm.mod.ntrees', gbm.mod$n.trees, '   max.trees: ', max.trees), quote = FALSE)
+        writeLines(paste0('--Finished Bootset: ', boot.i, '; Elapsed Time: ', Sys.time() - starttime))
+        writeLines(paste0('----- ntrees: ', gbm.mod$n.trees, '   max.trees: ', max.trees))
         gc() ## Helps clear memory
         return(boot.i)
     } ## End mcl.fun
 
     unlink(tree.filename)
-    unlink(assess.filename)
+    unlink(sp.pred.filename)
     unlink(test.filename)
         
-    print('Bootstrapping model fits', quote = FALSE)
+    writeLines('Fitting models')
 
     starttime <- Sys.time()
     out <- mclapply(1:nboots, mcl.fun, mc.cores = detectCores() - 2)
-    print(paste('Bootstrapping finished; Total Time: ', Sys.time() - starttime), quote = FALSE)
+    writeLines(paste('\n Model fitting complete; Total Time: ', Sys.time() - starttime))
 
     ## Aggregate and analyze the fitted models. Read in all raster predictions, average
     ## them, and save the resulting meta prediction.
-    print('Averaging bootstrapped fits', quote = FALSE)
+    writeLines('\n\n Averaging model fits')
 
     pred.stack.names <- list.files(models.folder, pattern = "*.tif$")
     fullname <- paste(models.folder,pred.stack.names, sep = '/')
     pred.stack <- stack(fullname)
     pred.rast <- mean(pred.stack, na.rm = TRUE)
-    writeRaster(pred.rast, file = paste('Figures_Fits/', prefix, '/', fold,'/Reservoir_Layer_', fold,".tif", sep = ''),
+    writeRaster(pred.rast, file = paste('Figures_Fits/', prefix, '/', fold,
+                                        '/Reservoir_Layer_', fold,".tif", sep = ''),
                 overwrite = TRUE)
 
     ## The code below investigates the model fits using variable importance ranking and
@@ -294,7 +296,7 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
                                          FUN = function(x){which(x==var.names)})), boot.i] <-
                     summ[var.names.boot,'rel.inf']
                 imp.dat <- rbind(imp.dat, data.frame(coef = var.names.boot, imp = summ[var.names.boot,'rel.inf']))
-                print(paste('Extracted boot', boot.i, '/', nboots), quote = FALSE)
+                writeLines(paste0('-Extracted boot ', boot.i, '/', nboots))
 
                 ## Save info on the learned relationship for each predictor
                 for(pred.i in 1:length(var.names.boot)){
@@ -326,7 +328,8 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
         geom_boxplot()
     p + scale_x_discrete(labels=rev(pretty.labels(ord.names[1:10]))) +
         labs(x = 'Predictor', y = 'Importance') + coord_flip()##ylim = c(0,35))
-    ggsave(filename = paste('Figures_Fits/', prefix, '/', fold ,'/Coef_', Abbrev.name,'.png', sep = ''), device = 'png')
+    ggsave(filename = paste('Figures_Fits/', prefix, '/', fold ,
+                            '/Coef_', Abbrev.name,'.png', sep = ''), device = 'png')
 
     ## Plot the learned relationships across all models
     response.dat$var <- factor(response.dat$var, levels = ord.names, ordered = TRUE)
@@ -366,7 +369,8 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
                          geom = 'line', size = 2, fun = mean, fun.args = list(na.rm = TRUE)) +
         facet_wrap(~var.pretty, ncol = 3, nrow = 2, scales = 'free') + xlab('Predictor Value') +
         ylab('Classification Score')
-    ggsave(filename = paste('Figures_Fits/', prefix, '/', fold, '/Effect_Response_', Abbrev.name,'.png', sep = ''),
+    ggsave(filename = paste('Figures_Fits/', prefix, '/', fold,
+                            '/Effect_Response_', Abbrev.name,'.png', sep = ''),
            device = 'png', width = 7, height = 5, units = 'in')
     
     ## Plot risk map averaged over all boot predictions
@@ -380,7 +384,7 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
     par(mai = 1*c(0.2,0.2,0.2,0.6))
     image.plot(pred.rast, col = heat.cols, zlim = c(0, 1),
                bty = 'n', xlab = '', ylab = '', xaxt = 'n', yaxt = 'n',
-               xlim = xlims, ylim = ylims, ##main = Species,
+               xlim = xlims, ylim = ylims, 
                asp = 1, legend.lab = 'Occurrence score', legend.line = 2.5,
                main = '')
     mtext(text = bquote(italic(.(Species))~'Distribution ('~'D'['M']~')'), side = 3, line = -1)
@@ -395,8 +399,8 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
     dev.off()
 
     ## Remove fitted models
-    unlink(models.folder, recursive = TRUE)
+    #unlink(models.folder, recursive = TRUE)
 
 } ## End function
 
-# LocalWords:  dataset
+

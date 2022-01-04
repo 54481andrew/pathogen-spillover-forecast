@@ -10,7 +10,7 @@
 ## boosted tree modeling, plotting, and
 ## calculating the AUC statistic
 require(raster)
-options("rgdal_show_exportToProj4_warnings"="none") ## Turn off gdal warnings
+##options("rgdal_show_exportToProj4_warnings"="none") ## Turn off gdal warnings
 require(rgdal)
 require(sf)
 require(parallel)
@@ -24,7 +24,7 @@ require(verification)
 require(viridis)
 
 ## Directory name that will contain output for all hyperparameter sets
-prefix <- 'reservoir_v5'
+prefix <- 'reservoir_v7'
 
 ## Set version of random number generator to use to ensure
 ## reproducibility across R versions
@@ -69,7 +69,7 @@ hypers.dat <- expand.grid(Species = c('Mastomys natalensis'),
                     lmt = 7
                     )
 
-cat(paste0('\n\n\n\n' , '---- ', prefix, ' ----', '\n\n\n\n'))
+writeLines(paste0('\n\n\n\n' , '---- Prefix: ', prefix, ' ----', '\n\n\n\n'))
 
 starttime <- Sys.time()
 
@@ -91,8 +91,7 @@ for(ii in 1:nrow(hypers.dat)){
     dir.create(models.folder,showWarnings = FALSE)
 
     ## Print model name
-    cat(paste0('\n\n\n\n'))
-    print(paste('--------- Model fit name:', fold, '-------------'), quote = FALSE)
+    writeLines(paste('\n\n\n --------- Model name:', fold, '------------- \n\n'))
     
     ## Prep in the presence/absence data for [Species]
     Species = paste(hypers.dat$Species[ii])
@@ -106,7 +105,7 @@ for(ii in 1:nrow(hypers.dat)){
                                     hypers.dat[ii,])
 
     ## Extract AUC statistics with (auc.pwd) and without (auc) pairwise distance sampling
-    tree.dat <- read.table(paste('Figures_Fits/', prefix, '/', fold,'/tree.dat',sep=''),
+    tree.dat <- read.table(paste('Figures_Fits/', prefix, '/', fold,'/tree_metrics.dat',sep=''),
                            header = TRUE)
     hypers.dat[ii,'auc'] <- mean(unlist(tree.dat[,'model.oob.auc']), na.rm = TRUE)
     hypers.dat[ii,'sd.auc'] <- sd(unlist(tree.dat[,'model.oob.auc']), na.rm = TRUE)
@@ -114,11 +113,11 @@ for(ii in 1:nrow(hypers.dat)){
     hypers.dat[ii,'auc.pwd'] <- mean(unlist(tree.dat[,'model.oob.auc.pwd']), na.rm = TRUE)
     hypers.dat[ii,'sd.auc.pwd'] <- sd(unlist(tree.dat[,'model.oob.auc.pwd']), na.rm = TRUE)
 
-    ## Write AUC statistics to file
-    write.table(hypers.dat, file = paste('Figures_Fits/', prefix, '/hypers_res_data', sep = ''),
+    ## Write model metrics to file
+    write.csv(hypers.dat, file = paste0('Figures_Fits/', prefix, '/hypers_res_data.csv'),
                 row.names = FALSE)
 
-    print(paste('--- ii:', ii, ' ---', sep = ''), quote = FALSE)
+    writeLines(paste0('\n \n --- Finished hyper-parameter set:', ii, ' ---'))
 }
 
 print(paste0('Run time: ', Sys.time() - starttime))

@@ -50,7 +50,7 @@ Calc.Sig.Pathogen.Preds <- function(dataset){
     
     ## Write significant predictor names to file.
     write.csv(sig.var.names, file = paste0('Figures_Fits/', prefix, '/',fold,'/',
-                                             'Sig_Pathogen_Preds.csv'),
+                                             'Sig_Pathogen_Predictors.csv'),
                 row.names = FALSE)
 
     return(sig.var.names)

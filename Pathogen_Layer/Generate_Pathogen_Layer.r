@@ -17,13 +17,13 @@ require(verification)
 require(ggplot2)
 require(ggthemes)
 require(plyr)
-options("rgdal_show_exportToProj4_warnings"="none") ## Turn off gdal warnings
+##options("rgdal_show_exportToProj4_warnings"="none") ## Turn off gdal warnings
 require(rgdal)
 require(viridis)
 
 
 ## Directory name that will contain output for all hyperparameter sets
-prefix <- 'pathogen_v5'
+prefix <- 'pathogen_v7'
 
 ## set version of random number generator to use to ensure
 ## reproducibility across R versions
@@ -63,7 +63,7 @@ hypers.dat <- expand.grid(nboots = 25,
                           lmt = 7
                           )
 
-cat(paste0('\n\n\n\n' , '---- ', prefix, ' ----', '\n\n\n\n'))
+writeLines(paste0('\n\n\n\n' , '---- Prefix: ', prefix, ' ----', '\n\n\n\n'))
 
 starttime <- Sys.time()
 
@@ -85,8 +85,7 @@ for(ii in 1:nrow(hypers.dat)){
     dir.create(models.folder,showWarnings = FALSE)
 
     ## Print model name
-    cat(paste0('\n\n\n\n'))
-    print(paste('--------- Model fit name:', fold, '-------------'), quote = FALSE)
+    writeLines(paste('\n\n\n --------- Model name:', fold, '------------- \n\n'))
     
     ## Prep the Mastomys natalensis LASV occurrence dataset and human serosurvey data
     rodlsv.survey.dat <- Prep.Pathogen.Data(hypers.dat[ii,])[[1]]
@@ -108,7 +107,7 @@ for(ii in 1:nrow(hypers.dat)){
     mod.out <- train.pathogen.learners(rodlsv.survey.dat, hypers.dat[ii,])
 
     ## Extract AUC statistics
-    tree.dat <- read.table(paste('Figures_Fits/', prefix, '/', fold,'/tree.dat',sep=''),
+    tree.dat <- read.table(paste('Figures_Fits/', prefix, '/', fold,'/tree_metrics.dat',sep=''),
                            header = TRUE)
     hypers.dat[ii,'auc'] <- mean(unlist(tree.dat[,'model.auc']), na.rm = TRUE)
     hypers.dat[ii,'sd.auc'] <- sd(unlist(tree.dat[,'model.auc']), na.rm = TRUE)
@@ -117,7 +116,8 @@ for(ii in 1:nrow(hypers.dat)){
     write.table(hypers.dat, file = paste('Figures_Fits/', prefix,'/hypers_lsv_data', sep = ''),
                 row.names = FALSE)
 
-    print(paste('--- ii:', ii, ' ---', sep = ''), quote = FALSE)
+    writeLines(paste0('\n \n --- Finished hyper-parameter set:', ii, ' ---'))
+
 }
 
 print(paste0('Run time: ', Sys.time() - starttime))

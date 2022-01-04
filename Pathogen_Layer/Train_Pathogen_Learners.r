@@ -111,9 +111,9 @@ train.pathogen.learners <- function(rodlsv.survey.dat, hypers.i = NULL){
         
         ## Save fit statistics to file
         tree.dat <- data.frame(boot.i = boot.i, n.tree = gbm.mod$n.trees, max.tree = max.trees,
-                               model.auc = rocArea.model, model.acc = acc,
-                               model.ll = model.ll, null.ll = null.ll,
-                               mcr2 = mcr2, adj.acc = adj.acc)
+                               model.oob.auc = rocArea.model, model.oob.acc = acc,
+                               model.oob.ll = model.ll, null.oob.ll = null.ll,
+                               model.oob.mcr2 = mcr2, model.oob.adj.acc = adj.acc)
         write.table(tree.dat, file = tree.filename,
                     col.names = !file.exists(tree.filename), row.names = FALSE,
                     append = file.exists(tree.filename))
@@ -134,29 +134,32 @@ train.pathogen.learners <- function(rodlsv.survey.dat, hypers.i = NULL){
         tif.filename = paste(models.folder, '/amod_',boot.i,'.tif', sep = '')
         writeRaster(pred.rast, filename = tif.filename, overwrite = TRUE)
 
-        print(paste('-- Finished Bootset: ', boot.i, '; Elapsed Time: ', Sys.time() - starttime), quote = FALSE)
-        print(paste('----- gbm.mod.trees', gbm.mod$n.trees, '   max.trees: ', max.trees), quote = FALSE)
+        writeLines(paste0('--Finished Bootset: ', boot.i, '; Elapsed Time: ', Sys.time() - starttime))
+        writeLines(paste0('----- ntrees: ', gbm.mod$n.trees, '   max.trees: ', max.trees))
+
         gc() ## helps clear memory
         return(boot.i)
     }## End mcl.fun
 
 
     tree.filename = paste0('Figures_Fits/', prefix, '/',
-                           fold, '/tree.dat')
+                           fold, '/tree_metrics.dat')
     test.filename = paste0('Figures_Fits/', prefix, '/',
-                           fold, '/test.dat')
+                           fold, '/test_predictions.dat')
     unlink(tree.filename)
     unlink(test.filename)
 
-    print('Bootstrapping model fits', quote = FALSE)
+    writeLines('\n Fitting models')
 
     starttime <- Sys.time()
     out <- mclapply(1:nboots,
                     mcl.fun, mc.cores = detectCores() - 2)
-    print(paste('Bootstrapping finished; Total Time: ', Sys.time() - starttime), quote = FALSE)
+    writeLines(paste('\n Model fitting complete; Total Time: ', Sys.time() - starttime))
 
     ## Aggregate and analyze the fitted models. Read in all raster predictions, average
     ## them, and save the resulting meta prediction.
+    writeLines('\n\n Averaging model fits')
+
     pred.stack.names <- list.files(models.folder , pattern = "*.tif$")
         fullname <- paste(models.folder,pred.stack.names, sep = '/')
     pred.stack <- stack(fullname)
@@ -179,7 +182,7 @@ train.pathogen.learners <- function(rodlsv.survey.dat, hypers.i = NULL){
                                          FUN = function(x){which(x==var.names)})), boot.i] <-
                     summ[var.names.boot,'rel.inf']
                 imp.dat <- rbind(imp.dat, data.frame(coef = var.names.boot, imp = summ[var.names.boot,'rel.inf']))
-                print(paste('Extracted boot', boot.i, '/', nboots), quote = FALSE)
+                writeLines(paste0('-Extracted boot ', boot.i, '/', nboots))
 
                 ## Save info on the learned relationship for each predictor
                 for(pred.i in 1:length(var.names.boot)){
@@ -279,6 +282,6 @@ train.pathogen.learners <- function(rodlsv.survey.dat, hypers.i = NULL){
     dev.off()
 
     ## Remove fitted models
-    unlink(models.folder, recursive = TRUE)
+    #unlink(models.folder, recursive = TRUE)
 
 }## End function

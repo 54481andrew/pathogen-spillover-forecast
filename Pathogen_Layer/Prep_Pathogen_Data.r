@@ -220,22 +220,21 @@ Prep.Pathogen.Data <- function(hypers.i){
                                             'Prepped_Human_Seroprevalence_Data.csv'),
               row.names = FALSE)
     
-    cat('--Lassa Rodent Count Statistics--')
+    writeLines('--Lassa Rodent Count Statistics--')
     tab <- table(jrod.purged$ArenaStat)
     print(addmargins(tab, FUN = list(Total = sum), quiet = TRUE))
     
     ## Number of seroprevalence studies of humans
-    print(paste('Number of Human Sources: ', length(unique(human.test.dat$Source))), quote = FALSE)
+    writeLines(paste0('Number of Human Sources: ', length(unique(human.test.dat$Source))))
     
     ## Number of countries
-    print(paste('Number of Countries: ', length(unique(human.test.dat$Country))), quote = FALSE)
+    writeLines(paste0('Number of Countries: ', length(unique(human.test.dat$Country))))
     
     ## Time span
     temp <- with(human.test.dat, strsplit(paste(Year), '-'))
     years = sapply(temp, FUN = function(x){range(as.numeric(x))})
     hum.yrange <- paste(range(years), collapse = '-')
-    print(paste0('Human seroprevalence collected between ', hum.yrange),
-          quote = FALSE)
+    writeLines(paste0('Human seroprevalence collected between ', hum.yrange, '\n\n'))
 
     ## Store some of the printed output to file
     nneg <- sum(jrod.purged$ArenaStat==0)

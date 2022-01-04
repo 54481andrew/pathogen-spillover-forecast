@@ -216,13 +216,13 @@ Prep.Reservoir.Data <- function(Species){
               row.names = FALSE)
     
     ## Print number of pixels classified as presences for each species
-    print('-- Count Statistics --', quote = FALSE)
+    writeLines('-- Count Statistics --')
     nback <- sum(classi.dat$Presence==0)
     npres <- sum(classi.dat$Presence==1)
     yrange <- paste0(min(classi.dat$min.Year), ' - ', max(classi.dat$max.Year))
-    print(paste0('Number Background: ', nback), quote = FALSE)
-    print(paste0('Number Presence: ', npres), quote = FALSE)
-    print(paste0('Collected Between: ', yrange), quote = FALSE)
+    writeLines(paste0('Number Background: ', nback))
+    writeLines(paste0('Number Presence: ', npres))
+    writeLines(paste0('Collected Between: ', yrange, '\n\n'))
 
     ## Lines below can be used during debug to see which genbank points were used. Helps avoid duplicates. 
     ## uids = classi.dat[!is.na(classi.dat$uID),'uID']    

@@ -55,7 +55,7 @@ Calc.Sig.Reservoir.Preds <- function(Species, dataset){
     
     ## Write significant predictor names to file.
     write.csv(sig.var.names, file = paste0('Figures_Fits/', prefix, '/',fold,'/',
-                                             'Sig_Reservoir_Preds_',Species.name,'.csv'),
+                                             'Sig_Reservoir_Predictors_',Species.name,'.csv'),
                 row.names = FALSE)
 
     return(sig.var.names)

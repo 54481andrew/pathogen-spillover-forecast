@@ -1,7 +1,7 @@
 
 # Overview
 
-This directory contains the scripts and data-sets used to build the
+This directory contains the scripts and datasets used to build the
 model that is outlined in the paper: 
 
 Basinski AJ, Fichet-Calvet E, Sjodin AR, Varrelman TJ, Remien CH,
@@ -19,26 +19,26 @@ expressions described in the manuscript. The model framework is applied
 to the Lassa virus (LASV), a rodent-borne pathogen capable of causing
 febrile illness (i.e., Lassa Fever) in humans.
 
-The scripts contained in this directory take in data-sets that
+The scripts contained in this directory take in datasets that
 describe locations of the LASV reservoir, locations of pathogen
 presence/absence from surveys of reservoir populations, as well as
 human seroprevalence data, and output a prediction of the number of
 spillover infections into human populations each year. 
 
 The model generates predictions of the spillover rate into humans in
-two stages.  In the first stage, the model learns to associate the
+two stages. In the first stage, the model learns to associate the
 spatial distribution of the animal reservoir, and the distribution of
 the pathogen, with environmental attributes and human population
-density.  These associations are learned by boosted classification
+density. These associations are learned by boosted classification
 trees within the Reservoir Layer and Pathogen Layer directories,
 respectively. These fitted models are used to generate a combined risk
-of pathogen spillover into humans.  The second stage of the model is
+of pathogen spillover into humans. The second stage of the model is
 contained in the Human_LASV_Incidence directory, and uses a regression
 model to associate seroprevalence in human populations with the
 combined risk derived in the first stage. Hypothesis testing that is
 associated with this regression automatically provides a rigorous
 evaluation of the spillover risk's ability to predict human LASV
-seroprevalence.  Lastly, an SIRS model is used to convert the
+seroprevalence. Lastly, an SIRS model is used to convert the
 predicted seroprevalence into estimates of human LASV infections in
 West Africa.
 
@@ -61,18 +61,20 @@ installing the following packages:
 # Predictors
 
 Predictors are included as a pre-processed raster stack
-(Storage/Raster_Data/all.stack). While we include the scripts that
+(Storage/Raster_Data/predictor_stack.grd). While we include the scripts that
 were used to process and compile the original raster data into
 stack-form, we do not include the original data itself because of
 storage considerations. If the user wishes to reproduce the
-calculations that produce the data stack, the original data-set must
+calculations that produce the predictor stack, the original dataset must
 be re-downloaded from the sources referenced in the manuscript and
 placed in the Original_Data directories within the Storage directory.
 
 Predictors that are used in the Reservoir layer, as well as the
 Pathogen layer, are chosen from the list of candidate predictors using
 a Wilcox significance test (described in the layers below). Candidate
-predictors are listed in the tables below.
+predictors are listed in the following tables. More information about
+each predictor can be found in the supplemental information of the
+manuscript that is cited above. 
 
 |Name| Description                                                      | 
 |----|------------------------------------------------------------------|
@@ -94,7 +96,7 @@ predictors are listed in the tables below.
 |Ndur| Duration of NDVI below 0.5                                       |
 |Pop | Human population density (humans / km^2)                         |
 
-Each environmental data-set was downloaded in its original raster
+Each environmental dataset was downloaded in its original raster
 form, and reprojected into 0.05 x 0.05 degree pixels using the WGS1984
 coordinate reference system. Precipitation, temperature, and NDVI
 rasters were used to generate measures of seasonality (e.g., Pcv,
@@ -104,8 +106,8 @@ Storage/Data_Scripts/ directory. Seasonal predictors are calculated
 within each year over the time span 2001 - 2019, then averaged across
 years.
 
-We also include land cover data derived from the MODIS land cover
-classification data-set. Each pixel of the reprocessed data rasters
+We also include land cover features derived from the MODIS land cover
+classification dataset. Each pixel of the reprocessed rasters
 describes the fraction of surrounding 0.15 x 0.15 degree area that is
 of a specific land cover type. Only those land cover predictors that
 had an average longevity of 20 or more years were included as
@@ -130,7 +132,7 @@ for an average time of 20 or more years:
 
 The derived seasonality features, as well as the land cover features, 
 are then combined into a named raster stack, and saved to the location
-Storage/Raster_Data/all.stack. This is performed by the script 
+Storage/Raster_Data/predictor_stack.grd. This is performed by the script 
 **Prep_Predictors.r**. 
 
 
@@ -144,18 +146,20 @@ the probability that any given pixel of West Africa contains
 
 The subdirectories are 
 
-- Data: Contains the data-sets that describe *M. natalensis*
+- Data: Contains the datasets that describe *M. natalensis*
   presences, as well as other rodent presences that are used as
   background data. The Excel file contains 2 spreadsheets. The first
   contains all literature records of genetically (or morphologically)
   confirmed *M. natalensis* rodents. The second spreadsheet is a
   cleaned version of the first; entries that were obtained through
   personal communication, museum specimens only, etc. are filtered
-  out.
+  out. A copy of this cleaned version (Mastomys_natalensis_presences.csv)
+  is converted into a CSV file that is read into R script files for analysis. 
 - Figures_Fits: Contains all figure outputs from the fitting process,
 as well as the final tif of the prediction.
-- Models: created at run time. Used to temporarily hold model files generated by
-Train_Reservoir_Learners.r code, and deleted after the model is fit.
+- Models: This directory is created at run time and used to
+temporarily hold model files generated by Train_Reservoir_Learners.r
+code. It is deleted after the fitting process is complete.
 - Tools: Contains a script with additional functions called Functions.r
 
 To re-derive all data-processing and model fitting performed for this
@@ -165,7 +169,7 @@ the main script by running:
 source("Generate_Reservoir_Layer.r").
 
 This script loads and calls three functions, defined in other scripts
-detailed below, that prepare the data-set (Prep_Reservoir_Data.r),
+detailed below, that prepare the dataset (Prep_Reservoir_Data.r),
 determine which predictors significantly vary with the response
 variable (Calc_Sig_Reservoir_Preds.r), and uses those predictors to
 train a set of 25 boosted classification trees
@@ -175,91 +179,100 @@ that specify a boosted classification tree algorithm, and passes said
 hyper-parameters to the Train.Reservoir.Learners function for fitting.
 All information from the Generate script is stored in a
 sub-directory of Figures_Fits, [prefix], that is created when the
-code is run. 
+code is run. The name [prefix] is a variable that is designated
+by the user at the top of the Generate script. 
 
-The three main functions that Generate_Reservoir_Learners.r calls are
-contained in the following scripts: 
+After the fitting procedure, this script writes a dataframe to
+[prefix] / hypers_res_data.csv that describes the performance of
+each hyper-parameter set that was simulated. Column names should be
+self-explanatory. The auc and auc.pwd columns show the out-of-bag AUC
+model performance without, and with, pairwise distance sampling.
+
+In addition, this script creates subdirectories within [prefix] that
+contain further information, figures, and metrics, for each
+hyper-parameter set that was run. These directories are of the form
+[prefix] / [model name], where [model_name] is assigned by the
+Generate script as a function of the hyperparameters. See the
+script-descriptions below for details. The three main functions that
+Generate_Reservoir_Learners.r calls are contained in the following
+scripts:
 
 ###  Prep_Reservoir_Data.r 
 
 This script defines the function Prep.Reservoir.Data. The function
 accepts a string that specifies the focal species. For now, this
-string can only take on the value "Mastomys natalensis", but other
-species will eventually be added. This function processes *M.
-natalensis* presence data. The output is a dataframe that contains
-Latitude, Longitude, and associated environmental predictors of pixels
-that contain Mastomys natalensis captures, as well as background
-captures of other Murids.
+string can only take on the value "Mastomys natalensis". This function
+processes *M.  natalensis* presence data. The output is a dataframe
+that contains Latitude, Longitude, and associated environmental
+predictors of pixels that contain Mastomys natalensis captures, as
+well as background captures of other Murids. This script also creates
+a PNG map of capture and pseudoabsence locations (saved in
+Figures_Fits/[prefix] / [model_name] directory).
 
 ###  Calc_Sig_Reservoir_Preds.r
 
 This script defines the Calc.Sig.Reservoir.Preds function. The
 function accepts a species name (string), as well as the dataframe
-output of Prep.Reservoir.Data, and outputs a list of predictors
-determined to significantly vary with the *M. natalensis* response
-variable. Here, absence refers to background captures of Murid
-rodents. Significance is determined by a Wilcox test with a threshold
-of p = 0.05.  Significant predictors, in turn, will be used to train
-the the model that predicts the reservoir's presence or absence.
+output of Prep.Reservoir.Data, and outputs a list of predictors that
+significantly vary with the *M. natalensis* response
+variable. Significance is determined by a Wilcox test with a threshold
+of p = 0.05. Significant predictors, in turn, will be used to train
+the model that predicts the reservoir's presence or absence.
  
 This function returns a list of the names of predictors that are
-deemed significant (also saved to Figures_Fits/Sig_Reservoir_preds),
-and also saves a pdf figure showing the distributions of the
-significant predictors.
+deemed significant (saved to
+Figures_Fits/[prefix]/[model name]/Sig_Reservoir_Predictors_Mastomys_natalensis.csv),
+and also saves a png figure showing histograms of the
+significant predictors vs response (saved to
+Figures_Fits/[prefix]/[model name]/Sig_Reservoir_Predictors_Mastomys_natalensis.png).
 
 ### Train_Reservoir_Learners
 
 This script defines a function, train.reservoir.learners, that takes
-as input a data-set (output by Prep.Reservoir.Data) and hyperparameter
-list (output of Calc.Sig.Reservoir.Preds), and saves to file a fitted
-reservoir risk layer. This script is the workhorse of the
-reservoir-model building process. Outputs are saved in the
-Figures_Fits/ directory, and include: 1) a .tif file of the averaged
-reservoir-risk prediction generated by [nboots] bootstrapped model
-fits. [nboots] is a hyperparameter defined in the
-Generate_Reservoir_Layer.r script; 2) Figures showing variable
-importance, learned relationships, and predicted risk across West
-Africa, averaged over all bootstrapped fits; 3) Data file tree.dat
-that contains information on the fitting process for each bootstrapped
-fit, including "area under the receiver operator curve" (AUC)
-calculated on an out-of-bag test set with and without pairwise
-distance sampling, and the number of trees-building iterations that
-were deemed best by cross-validation; 4) a data file assess.dat that
-shows the average classification score assigned to each type of
-species in the rodent dataset; 5) a data file grid_res_data that 
-summarizes performance across each hyper-parameter set. 
+as input a dataset (output by Prep.Reservoir.Data) and hyperparameter
+list (output of Calc.Sig.Reservoir.Preds), fits a set of BCT's, and
+saves to file a fitted reservoir risk layer. This script is the
+workhorse of the reservoir-model building process. Upon running, this
+function creates several files to the relevant [prefix]/[model name]
+directory, including 1) a .tif file of the averaged reservoir-risk
+prediction generated by [nboots] bootstrapped model fits. [nboots] is
+a hyperparameter defined in the Generate_Reservoir_Layer.r script; 2)
+Figures showing variable importance (Coef_Mn.png), learned
+feature-response relationships (Effect_Response_Mn.png), and predicted risk across West
+Africa averaged over all bootstrapped fits (Mn_Risk_Layer); 3) a data
+file tree_metrics.dat that contains information on the fitting process
+for each bootstrapped fit, including "area under the receiver operator
+curve" (AUC) calculated on an out-of-bag test set with and without
+pairwise distance sampling, and the number of boosting iterations
+that were deemed best by cross-validation; 4) two other files that
+describe performance.
 
-The grid_res_data (stored in prefix directory) gives a performance summary of each hyper-parameter
-set tried in Generate_Reservoir_Layer.r. Most columns are
-self-explanatory. The auc and auc.pwd columns show the out-of-bag AUC
-model performance without, and with, pairwise distance sampling. 
-
-The tree.dat file (stored in subdirectory of prefix) contains contains
-information on the out-of-bag model performance for each bootstrapped
+The tree_metrics.dat file (stored in directory [prefix]/[model_name]) contains
+detailed information on the out-of-bag model performance for each bootstrapped
 fit. The columns are:
 - boot.i: ith bootstrapped model, where i is between 1 and [nboots]
 - n.tree: number of trees used by the model 
 - max.tree: maximum number of trees allowed (set in
   Generate_Reservoir_Layer.r script
-- model.oob.auc: out-of-bag AUC on test data without pairwise distance
+- model.oob.auc: out-of-bag (OOB) AUC on test data without pairwise distance
   sampling
-- model.oob.auc.pwd: out-of-bag AUC on test data with pairwise
+- model.oob.auc.pwd: OOB AUC on test data with pairwise
   distance sampling
-- n.oob.auc: number of test points used in calculation of model.oob.auc
-- n.oob.auc.pwd: number of test points used in calculation of model.oob.auc.pwd
+- model.oob.auc[.pwd]: Accuracy on test data with or without pairwise sampling
+- model.oob.adj[.pwd]: Adjusted accuracy on test data with or without pairwise sampling
+- model.oob.mcr2[.pwd]: McFadden's R-squared on test data
+- model.oob.ll[.pwd]: Log-likelihood of model fit on test data
+- null.oob.ll[.pwd]: null model likelihood on test data (used in mcr2 calculation)
 
-The assess.dat file (stored in subdirectory of prefix) contains more
-information of how the bootstrapped models performed on various
-background species from the out of bag, pairwise-distance sampled test
-set. The columns are:
-- species
-- mean: The mean classification score assigned to that species,
-  averaged across all [nboots] models
-- sd: The standard deviation of the classification score across all models 
-- medianCount: The median number of background points that are of each
-  species type 
+Two other files that describe other information on performance:
 
+The species_predictions.dat file (stored in subdirectory of [prefix]/[model_name]) contains more
+information on the bootstrapped models' belief that various background points
+are Mastomys natalensis, organized around columns that describe the true species
+identity of the background point. 
 
+The test_predictions.dat file (stored in subdirectory of [prefix]/[model_name]) contains
+the history of the OOB test procedure for each of the bootstrapped models.
 
 
 # Pathogen_Layer
@@ -268,11 +281,9 @@ This directory contains scripts that take in data that describes the
 presence or absence of LASV in surveys of *Mastomys natalensis*, and 
 outputs a .tif file that describes the probability that, given that 
 *M. natalensis* is present in a pixel, LASV circulates in the rodent 
-population. 
-
-The directory structure is similar to the Reservoir_Layer directory.
-Scripts contained in this directory are directly analogous to those 
-described in the Reservoir_Layer directory.
+population. To the extent that is possible, the scripts and the
+directory structure are similar to that found in the
+Reservoir_Layer directory. 
 
 - Data: contains the datasets that describe LASV presence and absence
 in rodents, as well as data on serosurveys in humans. The Excel file
@@ -281,13 +292,18 @@ spreadsheet contains LASV records in *M. natalensis* found on GenBank;
 the "Raw_Lassa_Literature" spreadsheet contains LASV records in humans
 and rodents that were found through a literature search; and the
 "Cleaned_Lassa_Literature" spreadsheet contains cleaned version of
-LASV records in literature that is used to produce a CSV file that, in
-turn, is read into the model pipeline. Cleaning involved removing
+LASV records from literature. Cleaning involved removing
 human serosurveys that were nonrandom (e.g., tested individuals with
 symptoms, individual missionaries), and removing entries that did not
-specifically test *M. natalensis* rodents.
-
-- Figures_Fits
+specifically test *M. natalensis* rodents. The Genbank and Cleaned
+spreadsheets are used to create CSV files that are fed into the
+model pipeline. 
+- Figures_Fits: Contains all figure outputs from the fitting process,
+as well as the final tif of the prediction.
+- Models: This directory is created at run time and used to
+temporarily hold model files generated by Train_Reservoir_Learners.r
+code. It is deleted after the fitting process is complete.
+- Tools: Contains a script with additional functions called Functions.r
 
 To re-derive all data-processing and model fitting for this layer, set
 the Pathogen_Layer directory as the working directory, and then run:
@@ -295,56 +311,73 @@ the Pathogen_Layer directory as the working directory, and then run:
 source("Generate_Pathogen_Layer.r")
 
 As with the Generate_Reservoir_Layer script, this script loads and
-calls three functions that prepare the data-set (Prep_Pathogen_Data.r),
+calls three functions that prepare the dataset (Prep_Pathogen_Data.r),
 determine which predictors significantly vary with the response
 variable (Calc_Sig_Pathogen_Preds.r), and uses those predictors to
 train a set of 25 boosted classification trees
 (Train_Pathogen_Learners.r).
+
+After the fitting procedure, this script writes a dataframe to
+[prefix] / hypers_lsv_data.csv that describes the performance of each
+hyper-parameter set that was simulated. In addition, this script
+creates subdirectories within [prefix] that contain further
+information, figures, and metrics, for each hyper-parameter set that
+was run.
+
 
 ### Prep_Pathogen_Data.r
 
 This script defines the Prep.Pathogen.Data function. This function
 processes Lassa presence/absence data from published surveys of
 rodents and humans. The function returns a dataframe containing
-*M. natalensis* Lassa presence/absence data. The rodent
-dataframe contains environmental predictors that are used to train the
-pathogen layer of the model. Another dataset that contains human
-serosurvey data is saved to a csv file
-(Data/Prepped_Human_Seroprevalence_Data.csv), and used for the
-human stage of the framework.
+*M. natalensis* Lassa presence/absence data. This rodent dataframe
+includes environmental predictors that are used to train the pathogen
+layer of the model. In addition, this script processes and writes to
+file a dataframe describing human serosurvey data that is used to
+assess and calibrate the entire model pipeline (saved to
+Figures_Fits/[prefix]/[model
+name]/Prepped_Human_Seroprevalence_Data.csv).  In addition, this
+script writes several CSV files that describe how the data were
+processed (Prepped_Pathogen_Rodent_Absence_Data.csv,
+Prepped_Pathogen_Ambiguous_Data.csv, and
+Prepped_Pathogen_Ambiguous_Pixels.csv). These files contain details
+that describe how the original CSV files were processed. This script
+also produces a map figure (Human_Test_Dat.png) showing the locations
+of human test data. 
 
 ###  Calc_Sig_Pathogen_Preds.r
 
-Analogous to Calc_Sig_Reservoir_Preds.r. Defines a function called
-Calc.Sig.Pathogen.Preds that returns a list of those predictors that
-are significantly associated with the presence or absence of the
-pathogen. These are the predictors the boosted models are trained on.
- 
-This function returns a list of the names of predictors that
-are deemed significant (also saved to Figures_Fits/Sig_LASV_preds), and also
-saves a pdf figure showing the distributions of the significant
-predictors. 
+This script is analogous to Calc_Sig_Reservoir_Preds.r. When run, this
+script defines a function called Calc.Sig.Pathogen.Preds that returns
+a list of those predictors that are significantly associated with the
+presence or absence of the pathogen. These are the predictors that the
+boosted models are trained on. This list of predictors is saved to
+Figures_Fits/[prefix]/[model name]/Sig_Pathogen_Predictors.csv, along
+with a png figure showing histograms of the predictors grouped by
+response outcome.
+
 
 ### Train_Pathogen_Learners.r
 
 This script defines a function, train.pathogen.learners, that takes as
-input a data-set and hyperparameter list, and outputs the fitted
+input a dataset and hyperparameter list, and outputs the fitted
 pathogen risk layer.  This script is the workhorse of the
 pathogen-model building process, and is called by
-Generate_Pathogen_Layer.r.  Outputs are saved in the Figures_Fits/
-directory, and include: 1) a .tif file of the averaged pathogen-risk
-prediction generated by [nboots] bootstrapped model fits. [nboots] is
-a hyperparameter defined in the Generate_Pathogen_Layer.r script; 2)
-Figures showing variable importance, learned relationships, and
-predicted risk across West Africa, averaged over all bootstrapped
-fits; 3) Data file tree.dat that contains information on the fitting
-process for each bootstrapped fit, including "area under the receiver
-operator curve" (AUC) calculated on an out-of-bag test set, and the
-number of trees-building iterations that were deemed best by
-cross-validation; 4) data file grid_lsv_data (stored in prefix
-directory) that summarizes the performance of each hyper-parameter set
-run. See Train_Reservoir_Learners.r section for an explanation of 
-the data file column names. 
+Generate_Pathogen_Layer.r. As with the Reservoir layer analogue, this
+script writes several files to the relevant [prefix]/[model name]
+directory, including 1) .tif file of the averaged pathogen-risk
+prediction generated by [nboots] bootstrapped model fits (named
+Lassa_Layer_[model_name]). Here, [nboots] is a hyperparameter defined
+in the Generate_Pathogen_Layer.r script; 2) Figures showing variable
+importance (Coef_Lassa.png), learned feature-response relationships
+(Effect_Response_Lassa.png), and predicted risk of LASV (given the
+presence of *Mastomys natalensis*) for all of West Africa; 3) Data
+file tree_metrics.dat that contains information on the fitting process for
+each bootstrapped fit, including "area under the receiver operator
+curve" (AUC) calculated on an out-of-bag test set, and the number of
+boosting iterations that were deemed best by cross-validation; 4)
+Additional files (test_predictions.dat) that describe the OOB
+test procedure for each bootstrapped model. 
 
 
 ### Map_Cases.r
@@ -366,11 +399,12 @@ the reservoir and pathogen layers.
 This script reads in the tif outputs from Generate_Reservoir_Layer.r
 and Generate_Pathogen_Layer.r, and, using data from human LASV
 serosurveys, outputs a prediction of human LASV seroprevalence and
-incidence across West Africa. This prediction is made in three steps:
+incidence across West Africa. This script creates this prediction in three steps:
 
-1. Let $D_M$ and $D_L$ denote the reservoir and pathogen risk layers
-outputed Generate_*_Layer.r scripts above. Calculate the combined risk
-raster, $D_X$ as 
+1. Let $D_M$ and $D_L$ denote the reservoir and pathogen risk layer
+outputs of the Generate_*_Layer.r scripts. Each of these risk layers are
+the averages of [nboots] model fits. Calculate the combined risk
+raster, $D_X$, defined as 
 $$
 D_X = D_M \times D_L. 
 $$
@@ -380,11 +414,26 @@ $$
 3. Use equations derived in the manuscript to convert the predicted
    seroprevalence into predictions of LASV incidence. 
 
-Figures are saved in the [grid.name] folder (located within
-Figures_Fits), except for the product risk layer. This script also
-outputs a data file foc_case, contained in the grid.name folder, 
-that summarizes data found in the manuscript table. Column names are
-self-explanatory; "Pop" denotes the country's total population size. 
+At the top of the script, a user specifies a [grid.name] string;
+figures and text output are saved in the Figures_Fits/[grid.name]
+folder. PNG figures that are saved show the predicted human
+seroprevalence across West Africa (Lassa_Seroprevalence.png),
+the predicted rate of new cases of Lassa in humans (New_Cases.png),
+the combined risk layer (Combined_Risk_Layer.png), the deviance
+residuals resulting from the regression of human seroprevalence on
+the combined risk layer (Deviance_Residuals.png), and the
+predicted vs actual seroprevalence (Pred_vs_Fit.png).
+
+This script also outputs the data files:
+- foc_case: summarizes data found in the manuscript
+Table 4. 
+- metrics_output.csv: dataframe containing metrics of evaluation of
+fitted risk model on human test data. Columns are
+correlation of predicted seroprevalence and actual ("corr"),
+correlation weighted by number of humans tested ("corr.weighted"),
+p-value on Dx predictor in the GLM ("glm.pval"), and fraction
+of null deviance explained in GLM ("glm.frac.dev"). 
+- glm_summary: text output of GLM summary
 
 ### Human_Link_Analysis.cdf
 
