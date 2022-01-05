@@ -414,14 +414,13 @@ LASV seroprevalence and LASV case rate in West Africa. At the top of
 the script, a user specifies a [grid.name] string; figures and text
 output are saved in the Figures_Fits/[grid.name] folder.
 
-First, the script calculates the combined risk layer D_X. Let $D_M$
-and $D_L$ denote the reservoir and pathogen risk layer outputs of the
+First, the script calculates the combined risk layer D_X. Let D_M
+and D_L denote the reservoir and pathogen risk layer outputs of the
 Generate_*_Layer.r scripts. Each of these risk layers are the averages
-of [nboots] model fits. Calculate the combined risk raster, $D_X$,
+of [nboots] model fits. Calculate the combined risk raster, D_X,
 as
-$$
-D_X = D_M \times D_L. 
-$$
+D_X = D_M * D_L. 
+
 
 Next, the script evaluates several metrics that test the combined
 risk layer's ability to correlate with human serosurvey data. The
