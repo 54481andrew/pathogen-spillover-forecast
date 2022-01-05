@@ -108,8 +108,8 @@ for(ii in 1:nrow(hypers.dat)){
     ## Extract AUC statistics
     tree.dat <- read.table(paste('Figures_Fits/', prefix, '/', fold,'/tree_metrics.dat',sep=''),
                            header = TRUE)
-    hypers.dat[ii,'auc'] <- mean(unlist(tree.dat[,'model.auc']), na.rm = TRUE)
-    hypers.dat[ii,'sd.auc'] <- sd(unlist(tree.dat[,'model.auc']), na.rm = TRUE)
+    hypers.dat[ii,'auc'] <- mean(unlist(tree.dat[,'model.oob.auc']), na.rm = TRUE)
+    hypers.dat[ii,'sd.auc'] <- sd(unlist(tree.dat[,'model.oob.auc']), na.rm = TRUE)
 
     ## Write AUC statistics to file
     write.table(hypers.dat, file = paste('Figures_Fits/', prefix,'/hypers_lsv_data', sep = ''),

@@ -124,7 +124,7 @@ plot(rgeos::gIntersection(foc.shp.ogr, masto.rangemap), add = TRUE, bty = 'n', a
 dev.off()
 
 ## Save raster copy of the Dx layer
-writeRaster(Dx, filename = paste0(fold.name, '/Combined_Risk_Layer.tif')
+writeRaster(Dx, filename = paste0(fold.name, '/Combined_Risk_Layer.tif'))
 
 ## ---- Regress human seroprevalence on D_X layer
 
@@ -179,7 +179,7 @@ metric.output = data.frame(corr = corr, corr.weighted = corr.weighted,
 write.csv(metric.output, paste0(fold.name, '/metrics_output.csv'))
 
 ## Save quasibinomial GLM model output          
-capture.output(qbin.summ, file = paste0(fold.name, '/glm_summary')
+capture.output(qbin.summ, file = paste0(fold.name, '/glm_summary'))
           
 ## ---Make a plot of the deviance residuals
 png(filename = paste(fold.name,'/Deviance_Residuals.png',sep=''),

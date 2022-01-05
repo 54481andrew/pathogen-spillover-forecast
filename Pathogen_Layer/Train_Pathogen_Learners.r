@@ -100,11 +100,8 @@ train.pathogen.learners <- function(rodlsv.survey.dat, hypers.i = NULL){
         null.predictions <- mean(train.survey.data$ArenaStat)
         model.ll <- sum(test.survey.data$ArenaStat*log(model.predictions) +
                            (1-test.survey.data$ArenaStat)*log(1-model.predictions))
-        ## model.deviance <- -2*model.ll
         null.ll <- sum(test.survey.data$ArenaStat*log(null.predictions) +
                               (1-test.survey.data$ArenaStat)*log(1-null.predictions))
-        ## null.deviance <- -2*null.ll
-        ## D2 <- (null.deviance - model.deviance)/null.deviance
 
         ## Calculate McFadden's pseudo-r-squared
         mcr2 <- 1 - model.ll/null.ll 
@@ -128,10 +125,10 @@ train.pathogen.learners <- function(rodlsv.survey.dat, hypers.i = NULL){
                     append = file.exists(test.filename))
         
         ## Save model and tif prediction of this bootstrap fit
-        mod.filename = paste(models.folder, '/amod_',boot.i,'.rds', sep = '')
+        mod.filename = paste0(models.folder, '/amod_',boot.i,'.rds')
         saveRDS(gbm.mod, file = mod.filename)
 
-        tif.filename = paste(models.folder, '/amod_',boot.i,'.tif', sep = '')
+        tif.filename = paste0(models.folder, '/amod_',boot.i,'.tif')
         writeRaster(pred.rast, filename = tif.filename, overwrite = TRUE)
 
         writeLines(paste0('--Finished Bootset: ', boot.i, '; Elapsed Time: ', Sys.time() - starttime))
@@ -283,5 +280,6 @@ train.pathogen.learners <- function(rodlsv.survey.dat, hypers.i = NULL){
 
     ## Remove fitted models
     #unlink(models.folder, recursive = TRUE)
-
+    return(out)
+    
 }## End function
