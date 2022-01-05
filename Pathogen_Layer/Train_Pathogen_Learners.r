@@ -192,7 +192,9 @@ train.pathogen.learners <- function(rodlsv.survey.dat, hypers.i = NULL){
                     response.dat <- rbind(response.dat,
                                           new.dat)
                 }## Loop through predictors
-        } ## Check if file exists
+        }else{ ## Check if file exists
+            writeLines(paste0('boot DNE', boot.i))
+        }
     }## End loop through boots
 
     ## Extract top 10 most important predictors for a boxplot.

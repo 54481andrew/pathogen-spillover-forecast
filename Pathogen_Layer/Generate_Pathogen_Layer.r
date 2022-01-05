@@ -7,6 +7,21 @@
 ## Require packages used for gis, parallel,
 ## boosted tree modeling, plotting, and
 ## calculating the AUC statistic
+## require(raster)
+## require(rgdal)
+## require(sf)
+## require(parallel)
+## require(dismo)
+## require(gbm)
+## require(fields)
+## require(ggplot2)
+## require(ggthemes)
+## require(gridExtra)
+## require(grid)
+## require(plyr)
+## require(verification)
+## require(viridis)
+
 require(raster)
 require(dismo)
 require(gbm)
@@ -19,7 +34,7 @@ require(ggthemes)
 require(plyr)
 require(rgdal)
 require(viridis)
-
+require(gridExtra)
 
 ## Directory name that will contain output for all hyperparameter sets
 prefix <- 'pathogen_v6'
@@ -42,7 +57,7 @@ masto.rangemap <-readOGR(dsn = paste(storage.fold, '/Shapefiles/Masto_Range', se
 
 ## Additional functions used by Train_Pathogen_Learners
 source("Tools/Functions.r")
-source('Prep_Pathogen_Data.r') ## AJBhere check rm ,local = TRUE
+source('Prep_Pathogen_Data.r') 
 source("Calc_Sig_Pathogen_Preds.r")
 
 ## Load function that trains learners with a given set of hyperparameters
