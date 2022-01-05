@@ -379,7 +379,8 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
     ylims = c(16, 16.5)
     points.sp <- presence.data[,c('Longitude','Latitude')]
     pred.rast = mask(pred.rast, masto.rangemap, updatevalue = 0)
-    png(file = paste('Figures_Fits/',prefix,'/',fold,'/', Abbrev.name,'_Risk_Layer.png', sep = ''),
+    png(file = paste('Figures_Fits/',prefix,'/',fold,'/', '_Risk_Layer',
+                     Abbrev.name, '.png', sep = ''),
     width = 6, height = 4, units = 'in', res = 400)
     par(mai = 1*c(0.2,0.2,0.2,0.6))
     image.plot(pred.rast, col = heat.cols, zlim = c(0, 1),

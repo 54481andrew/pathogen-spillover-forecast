@@ -10,7 +10,6 @@
 ## boosted tree modeling, plotting, and
 ## calculating the AUC statistic
 require(raster)
-##options("rgdal_show_exportToProj4_warnings"="none") ## Turn off gdal warnings
 require(rgdal)
 require(sf)
 require(parallel)
@@ -24,7 +23,7 @@ require(verification)
 require(viridis)
 
 ## Directory name that will contain output for all hyperparameter sets
-prefix <- 'reservoir_v7'
+prefix <- 'reservoir_v6'
 
 ## Set version of random number generator to use to ensure
 ## reproducibility across R versions
@@ -98,6 +97,8 @@ for(ii in 1:nrow(hypers.dat)){
     classi.dat.rod <- Prep.Reservoir.Data(Species)
 
     ## Predictors that are deemed significant by the Wilcox test
+    ## var.names is a global variable that will be used by the
+    ## function Train.Reservoir.Learners
     var.names <- Calc.Sig.Reservoir.Preds(Species, classi.dat.rod)
 
     ## Train learners with the given set of hyperparameters

@@ -17,13 +17,12 @@ require(verification)
 require(ggplot2)
 require(ggthemes)
 require(plyr)
-##options("rgdal_show_exportToProj4_warnings"="none") ## Turn off gdal warnings
 require(rgdal)
 require(viridis)
 
 
 ## Directory name that will contain output for all hyperparameter sets
-prefix <- 'pathogen_v7'
+prefix <- 'pathogen_v6'
 
 ## set version of random number generator to use to ensure
 ## reproducibility across R versions
