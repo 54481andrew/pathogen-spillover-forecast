@@ -1,5 +1,5 @@
 ## This script defines a function, train.pathogen.learners, that takes
-## as input a data-set and hyperparameter list, and outputs the fitted
+## as input a data-set and hyperparameter list, and creates the fitted
 ## pathogen risk layer.  This script is the workhorse of the
 ## pathogen-model building process, and is called by
 ## Generate_Pathogen_Layer.r.  Outputs are saved in the Figures_Fits/
@@ -76,7 +76,7 @@ train.pathogen.learners <- function(rodlsv.survey.dat, hypers.i = NULL){
         } ## End While
 
         ## Test performance on out-of-bag presences and pseudoabsence points. We'll store
-        ## AUC and accuracy. 
+        ## AUC, McFaddens R-squared, and accuracy. 
 
         ## Predict and assess gbm.mod on test.survey.data
         pred.rast <- predict(all.stack[[var.names]], gbm.mod, n.trees = gbm.mod$n.trees,
@@ -280,6 +280,8 @@ train.pathogen.learners <- function(rodlsv.survey.dat, hypers.i = NULL){
 
     ## Remove fitted models
     #unlink(models.folder, recursive = TRUE)
+
+    ## Return out variable for debugging
     return(out)
     
 }## End function

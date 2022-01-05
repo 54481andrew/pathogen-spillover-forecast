@@ -1,10 +1,11 @@
 ## This script loops through sets of hyper-parameters that specify a
-## boosted regression tree algorithm. Specifically, this script passes a
-## set of parameters and data-set to the train.reservoir.learners
-## function, which, in turn, performs the boosting algorithm and
-## generates output. Most of the work in the boosting algorithm for this
-## layer is contained in the Train_Reservoir_Learners.r script, which
-## defines the train.reservoir.learners.r function (see below).
+## boosted regression tree algorithm and fits the corresponding
+## model. Specifically, this script passes a set of parameters and
+## data-set to the train.reservoir.learners function, which, in turn,
+## performs the boosting algorithm and generates output. Most of the
+## work in the boosting algorithm for this layer is contained in the
+## Train_Reservoir_Learners.r script, which defines the
+## train.reservoir.learners.r function (see below).
 
 ## Require packages used for gis, parallel,
 ## boosted tree modeling, plotting, and
@@ -36,7 +37,7 @@ raster.data.fold <- paste(storage.fold,'/Raster_Data', sep = '')
 ## Load in predictor stack. Used for predicting across West Africa
 all.stack <- stack(paste(raster.data.fold, "/predictor_stack.grd", sep = ''))
 
-## Load in shape files for plotting West Africa, and the
+## Load in shape files for plotting West Africa and the
 ## Mastomys natalensis homerange
 foc.shp.ogr <- readOGR(dsn = paste(storage.fold, '/Shapefiles/West_Africa', sep = ''), layer = 'foc', verbose = FALSE)
 africa.shp.ogr <- readOGR(dsn = paste(storage.fold, '/Shapefiles/Africa', sep = ''), layer = 'Africa')
@@ -55,7 +56,7 @@ source("Calc_Sig_Reservoir_Preds.r")
 source("Train_Reservoir_Learners.r")
 
 ## Set hyperparameters.
-## nboots - number of times the data is sampled and the model fit
+## nboots - number of times that the data is sampled and a model is fit
 ## num.bg.points - number of background points. Character entry sets this to the number of presences
 ## tree.complexity - depth of trees that are fit at each model iteration
 ## mllr - minus log10 of the learning rate
@@ -92,13 +93,13 @@ for(ii in 1:nrow(hypers.dat)){
     ## Print model name
     writeLines(paste('\n\n\n --------- Model name:', fold, '------------- \n\n'))
     
-    ## Prep in the presence/absence data for [Species]
+    ## Prep the presence/absence data for [Species]
     Species = paste(hypers.dat$Species[ii])
     classi.dat.rod <- Prep.Reservoir.Data(Species)
 
-    ## Predictors that are deemed significant by the Wilcox test
-    ## var.names is a global variable that will be used by the
-    ## function Train.Reservoir.Learners
+    ## Predictors that are deemed significant by the Wilcox test are
+    ## stored in var.names; this is a global variable that will be
+    ## used by the function Train.Reservoir.Learners
     var.names <- Calc.Sig.Reservoir.Preds(Species, classi.dat.rod)
 
     ## Train learners with the given set of hyperparameters
@@ -114,7 +115,7 @@ for(ii in 1:nrow(hypers.dat)){
     hypers.dat[ii,'auc.pwd'] <- mean(unlist(tree.dat[,'model.oob.auc.pwd']), na.rm = TRUE)
     hypers.dat[ii,'sd.auc.pwd'] <- sd(unlist(tree.dat[,'model.oob.auc.pwd']), na.rm = TRUE)
 
-    ## Write model metrics to file
+    ## Write model metrics and hyperparameter set to file
     write.csv(hypers.dat, file = paste0('Figures_Fits/', prefix, '/hypers_res_data.csv'),
                 row.names = FALSE)
 

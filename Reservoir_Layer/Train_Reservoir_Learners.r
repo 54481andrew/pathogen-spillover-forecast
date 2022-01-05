@@ -1,5 +1,5 @@
 ## This script defines a function, train.reservoir.learners, that takes
-## as input a data-set and hyperparameter list, and outputs the fitted
+## as input a data-set and hyperparameter list, and creates the fitted
 ## reservoir risk layer.  This script is the workhorse of the
 ## reservoir-model building process, and is called by
 ## Generate_Reservoir_Layer.r.  Outputs are saved in the Figures_Fits/
@@ -96,9 +96,9 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
 
         ##---
 
-        ## Test performance on out-of-bag presences and pseudoabsence points.
-        ## Assess AUC both with and without pairwise distance sampling, as well as
-        ## accuracy. 
+        ## Test performance on out-of-bag presences and pseudoabsence
+        ## points.  Assess AUC, McFaddens R-squared, and accuracy,
+        ## each with and without pairwise distance accuracy.
 
         ## Obtain out-of-bag presences
         wi.test.pres <- (1:nrow(presence.data))[-wi.train.pres]
@@ -402,6 +402,8 @@ Train.Reservoir.Learners <- function(dataset, hypers.i = NULL){
     ## Remove fitted models
     #unlink(models.folder, recursive = TRUE)
 
+    ## Return out variable for debugging
+    return(out)
 } ## End function
 
 

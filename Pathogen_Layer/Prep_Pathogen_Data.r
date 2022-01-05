@@ -8,7 +8,7 @@
 ## number of rodents that need to be tested to call a site LASV-; if [min.test]
 ## rodents are tested and none have LASV exposure, the pixel is classified as
 ## LASV-. [set.ambiguous.to] determines how pixels without virus detection, but
-## with seropositive rodents, are handled. The natural choices are NA (omitted)
+## with seropositive rodents, are handled. The allowed choices are NA (omitted)
 ## or 1 (counted as LASV+). 
 
 Prep.Pathogen.Data <- function(hypers.i){

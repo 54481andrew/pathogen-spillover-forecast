@@ -1,8 +1,8 @@
 ## This script loops through sets of hyper-parameters that specify a
-## boosted regression tree algorithm. Specifically, this script passes
-## a set of parameters and data-set to the train.pathogen.learners
-## function, which, in turn, performs the boosting algorithm and
-## generates output.
+## boosted regression tree algorithm and fits the corresponding
+## model. Specifically, this script passes a set of parameters and
+## data-set to the train.pathogen.learners function, which, in turn,
+## performs the boosting algorithm and generates output.
 
 ## Require packages used for gis, parallel,
 ## boosted tree modeling, plotting, and
@@ -24,7 +24,7 @@ require(viridis)
 ## Directory name that will contain output for all hyperparameter sets
 prefix <- 'pathogen_v6'
 
-## set version of random number generator to use to ensure
+## Set version of random number generator to use to ensure
 ## reproducibility across R versions
 RNGversion('3.6.0')
 
@@ -35,20 +35,21 @@ raster.data.fold <- paste(storage.fold,'/Raster_Data', sep = '')
 ## Load in predictor stack. Used for predicting across West Africa
 all.stack <- stack(paste(raster.data.fold, "/predictor_stack.grd", sep = ''))
 
-## Load in shape files for plotting
+## Load in shape files for plotting West Africa and the
+## Mastomys natalensis homerange
 foc.shp.ogr <- readOGR(dsn = paste(storage.fold, '/Shapefiles/West_Africa', sep = ''), layer = 'foc', verbose = FALSE)
 masto.rangemap <-readOGR(dsn = paste(storage.fold, '/Shapefiles/Masto_Range', sep = ''), layer = 'data_0', verbose = FALSE)
 
 ## Additional functions used by Train_Pathogen_Learners
 source("Tools/Functions.r")
-source('Prep_Pathogen_Data.r', local = TRUE)
+source('Prep_Pathogen_Data.r') ## AJBhere check rm ,local = TRUE
 source("Calc_Sig_Pathogen_Preds.r")
 
 ## Load function that trains learners with a given set of hyperparameters
 source("Train_Pathogen_Learners.r")
 
 ## Set hyperparameters.
-## nboots - number of times the data is sampled and the model fit
+## nboots - number of times that the data is sampled and a model is fit
 ## set.ambiguous.to - NA or 1; what to do with pixels with no LASV virus detected but + rodent serology
 ## min.test - minimum number of tested rodents required for (LASV-) pixel status. 
 ## tree.complexity - depth of trees that are fit at each model iteration
@@ -99,7 +100,9 @@ for(ii in 1:nrow(hypers.dat)){
     ## Map the prepared dataset
     source("Map_Cases.r")
     
-    ## Predictors that are deemed significant by the Wilcox test
+    ## Predictors that are deemed significant by the Wilcox test are
+    ## stored in var.names; this is a global variable that will be
+    ## used by the function Train.Reservoir.Learners
     var.names <- Calc.Sig.Pathogen.Preds(rodlsv.survey.dat)
 
     ## Train learners with the given set of hyperparameters
@@ -111,7 +114,7 @@ for(ii in 1:nrow(hypers.dat)){
     hypers.dat[ii,'auc'] <- mean(unlist(tree.dat[,'model.oob.auc']), na.rm = TRUE)
     hypers.dat[ii,'sd.auc'] <- sd(unlist(tree.dat[,'model.oob.auc']), na.rm = TRUE)
 
-    ## Write AUC statistics to file
+    ## Write model metrics and hyperparameter set to file
     write.table(hypers.dat, file = paste('Figures_Fits/', prefix,'/hypers_lsv_data', sep = ''),
                 row.names = FALSE)
 

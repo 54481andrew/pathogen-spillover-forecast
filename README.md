@@ -48,6 +48,11 @@ SIRS model is used to convert the predictions of the seroprevalence
 regression into estimates of human LASV infections per year in West
 Africa.
 
+The script metrics.r provides a simple means of loading and printing
+the evaluation metrics of a specific reservoir and pathogen layer, as
+well as the performance of the combined risk layer (Dx) on human
+seroprevalence. 
+
 The results presented in the manuscript were created with R version
 4.0.0 (2020-04-24) "Arbor Day". Different versions of R
 will give slightly different results because of differences in the random
