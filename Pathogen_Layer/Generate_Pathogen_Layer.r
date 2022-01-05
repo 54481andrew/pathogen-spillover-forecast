@@ -4,24 +4,6 @@
 ## data-set to the train.pathogen.learners function, which, in turn,
 ## performs the boosting algorithm and generates output.
 
-## Require packages used for gis, parallel,
-## boosted tree modeling, plotting, and
-## calculating the AUC statistic
-## require(raster)
-## require(rgdal)
-## require(sf)
-## require(parallel)
-## require(dismo)
-## require(gbm)
-## require(fields)
-## require(ggplot2)
-## require(ggthemes)
-## require(gridExtra)
-## require(grid)
-## require(plyr)
-## require(verification)
-## require(viridis)
-
 require(raster)
 require(dismo)
 require(gbm)
