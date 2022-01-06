@@ -1,0 +1,2 @@
+"Species","nboots","num.bg.points","tree.complexity","mllr","lmt","auc","sd.auc","auc.pwd","sd.auc.pwd"
+"Mastomys natalensis",25,"Same",1,2,7,0.718113491227378,0.0392484811301303,0.675643459068247,0.0466459643023579

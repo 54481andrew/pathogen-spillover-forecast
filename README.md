@@ -55,8 +55,15 @@ seroprevalence.
 
 The results presented in the manuscript were created with R version
 4.0.0 (2020-04-24) "Arbor Day". Different versions of R
-will give slightly different results because of differences in the random
-number generator that is used. Running the model code requires
+and packages within will yield slightly different results. Recently, I
+reran each of the scripts with a more up-to-date version:
+R version 4.1.2 (2021-11-01) "Bird Hippie". Output from these
+newer simulations are contained in directories that start with v7, while
+output from the original simulations are in directories that start
+with v6. The metrics, figures, etc are essentially identical. See below
+for more details on output locations of each script. 
+
+Running the model code requires
 installing the following packages:
 
 | Functionality                | Package Names               | 

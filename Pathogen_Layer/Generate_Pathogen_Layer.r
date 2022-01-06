@@ -19,7 +19,7 @@ require(viridis)
 require(gridExtra)
 
 ## Directory name that will contain output for all hyperparameter sets
-prefix <- 'pathogen_v6'
+prefix <- 'pathogen_v7'
 
 ## Set version of random number generator to use to ensure
 ## reproducibility across R versions

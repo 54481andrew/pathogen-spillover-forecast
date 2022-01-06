@@ -39,11 +39,11 @@ set.seed(1)
 ## predictions. 
 set.ambiguous.to <- NA
 min.test <- 5
-grid.name <- paste0('human_v6_ambi',set.ambiguous.to, '_mint_', min.test) ## name for model.dat dataframe
-prefix.masto <- 'reservoir_v6' ## prefix used in Generate_Reservoir_Layer
+grid.name <- paste0('human_v7_ambi',set.ambiguous.to, '_mint_', min.test) ## name for model.dat dataframe
+prefix.masto <- 'reservoir_v7' ## prefix used in Generate_Reservoir_Layer
 masto.fold <- 'Mn_pa_nboots_25_nbg_Same_tc_1_mllr_2_lmt_7'
 
-prefix.lassa <-  'pathogen_v6' ## prefix used in Generate_Lassa_Layer
+prefix.lassa <-  'pathogen_v7' ## prefix used in Generate_Lassa_Layer
 lassa.fold <- paste0("pa_nboots_25_1_mllr_3_lmt_7_ambi_", set.ambiguous.to, "_mintest_",min.test)
 
 
@@ -124,7 +124,8 @@ plot(rgeos::gIntersection(foc.shp.ogr, masto.rangemap), add = TRUE, bty = 'n', a
 dev.off()
 
 ## Save raster copy of the Dx layer
-writeRaster(Dx, filename = paste0(fold.name, '/Combined_Risk_Layer.tif'))
+writeRaster(Dx, filename = paste0(fold.name, '/Combined_Risk_Layer.tif'),
+            overwrite = TRUE)
 
 ## ---- Regress human seroprevalence on D_X layer
 
@@ -161,15 +162,13 @@ human.test.dat$y.linear <- with(human.test.dat,
 
 ## Evaluate correlation between human seroprevalence and predictions
 corr <- cor(human.test.dat$fitted, human.test.dat$PropAb)
-## 0.3272
+
 corr.weighted <- cov.wt(cbind(human.test.dat$fitted, human.test.dat$PropAb),
                         wt = human.test.dat$NumTestAb,
                         cor = TRUE)$cor[2,1]
-## 0.3975
 
 ## Calculate the fraction of deviance that is explained
 dev.explained <- 1 - qbin.summ$deviance / qbin.summ$null.deviance
-## 0.1565705
 
 ## Save the above metrics to file (glm.pval is the pvalue associated with Dx coefficient)
 metric.output = data.frame(corr = corr, corr.weighted = corr.weighted,
